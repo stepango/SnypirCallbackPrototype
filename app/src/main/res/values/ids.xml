@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="contacts_loader" type="id"/>
+    <item name="snypir_contacts_loader" type="id"/>
+    <item name="contatcs_search_loader" type="id"/>
+</resources>
