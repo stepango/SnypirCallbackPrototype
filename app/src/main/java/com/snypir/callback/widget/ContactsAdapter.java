@@ -110,53 +110,25 @@ public class ContactsAdapter extends CursorAdapter implements
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-
-        if (convertView == null) {
-            holder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.li_contact, parent, false);
-            holder.name = (TextView) convertView.findViewById(R.id.text1);
-            holder.phone = (TextView) convertView.findViewById(R.id.text2);
-            holder.image = (ImageView) convertView.findViewById(R.id.image);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
-        final Cursor c = getCursor();
-        if (c != null) {
-            c.moveToPosition(position);
-            int nameIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY);
-            int phoneIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-            int imageIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI);
-            holder.name.setText(c.getString(nameIndex));
-            holder.name.setSelected(true);
-            holder.phone.setText(c.getString(phoneIndex));
-            String uri = c.getString(imageIndex);
-            if (!TextUtils.isEmpty(uri)) {
-                Picasso.with(mContext)
-                        .load(Uri.parse(uri))
-                        .placeholder(R.drawable.ic_launcher)
-                        .into(holder.image);
-            } else {
-                holder.image.setImageResource(R.drawable.ic_launcher);
-            }
-        }
-
-        return convertView;
-    }
-
-    @Override
     public View newView(final Context context, final Cursor cursor, final ViewGroup viewGroup) {
         return mInflater.inflate(R.layout.li_contact, viewGroup, false);
     }
 
     @Override
     public void bindView(final View view, final Context context, final Cursor c) {
-        int nameIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY);
-        int phoneIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-        ((TextView) view.findViewById(R.id.text1)).setText(getCursor().getString(nameIndex));
-        ((TextView) view.findViewById(R.id.text2)).setText(getCursor().getString(phoneIndex));
+        int nameIndex = c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY);
+        int imageIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI);
+        ((TextView) view.findViewById(R.id.text1)).setText(c.getString(nameIndex));
+        ImageView image = (ImageView) view.findViewById(R.id.image);
+        String uri = c.getString(imageIndex);
+        if (!TextUtils.isEmpty(uri)) {
+            Picasso.with(mContext)
+                    .load(Uri.parse(uri))
+                    .placeholder(R.drawable.ic_launcher)
+                    .into(image);
+        } else {
+            image.setImageResource(R.drawable.ic_launcher);
+        }
     }
 
     @Override
@@ -230,12 +202,6 @@ public class ContactsAdapter extends CursorAdapter implements
 
     class HeaderViewHolder {
         TextView text;
-    }
-
-    class ViewHolder {
-        TextView name;
-        TextView phone;
-        ImageView image;
     }
 
 }

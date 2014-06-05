@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 
 import com.snypir.callback.R;
+import com.snypir.callback.utils.ContentProviderUtils;
 import com.snypir.callback.widget.ContactsSnypirAdapter;
 
 import org.androidannotations.annotations.AfterViews;
@@ -28,42 +29,47 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
 
     private ContactsSnypirAdapter mCursorAdapter;
 
-    @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mCursorAdapter = new ContactsSnypirAdapter(getActivity());
-        getLoaderManager().initLoader(R.id.snypir_contacts_loader, null, this);
-    }
-
     @AfterViews
     void init() {
         mListView.setDismissCallback(new EnhancedListView.OnDismissCallback() {
             @Override
             public EnhancedListView.Undoable onDismiss(final EnhancedListView enhancedListView, final int i) {
+                final Cursor c = mCursorAdapter.getCursor();
+                if (c != null) {
+                    c.moveToPosition(i);
+                    mCursorAdapter.putPendingDismiss(c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID)));
+                    mCursorAdapter.notifyDataSetChanged();
+                    final String phone = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    final long rawContactId = c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID));
+                    ContentProviderUtils.removePhone(getActivity(), phone);
+                    return new EnhancedListView.Undoable() {
+                        @Override
+                        public void undo() {
+                            ContentProviderUtils.addPhone(getActivity(), rawContactId, phone);
+                        }
+                    };
+                }
                 return null;
-            }
-        });
-        mListView.setShouldSwipeCallback(new EnhancedListView.OnShouldSwipeCallback() {
-            @Override
-            public boolean onShouldSwipe(final EnhancedListView enhancedListView, final int i) {
-                return true;
             }
         });
         mListView.setSwipeDirection(EnhancedListView.SwipeDirection.START);
         mListView.setSwipingLayout(R.layout.li_header);
         mListView.enableSwipeToDismiss();
         mListView.setFastScrollEnabled(true);
+        mCursorAdapter = new ContactsSnypirAdapter(getActivity());
+        mListView.setAdapter(mCursorAdapter);
+        getLoaderManager().initLoader(R.id.snypir_contacts_loader, null, this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(final int i, final Bundle bundle) {
         return new CursorLoader(
                 getActivity(),
-                ContactsContract.Data.CONTENT_URI,
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 null,
-                null,
-                null,
-                ContactsContract.Data.DISPLAY_NAME_PRIMARY + " COLLATE LOCALIZED ASC"
+                ContactsContract.CommonDataKinds.Phone.LABEL + "=?",
+                new String[]{"Snypir" },
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY + " COLLATE LOCALIZED ASC"
         );
     }
 
@@ -71,7 +77,6 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     public void onLoadFinished(final Loader<Cursor> loader, final Cursor c) {
         if (loader.getId() == R.id.snypir_contacts_loader) {
             mCursorAdapter.swapCursor(c);
-            mListView.setAdapter(mCursorAdapter);
         }
     }
 

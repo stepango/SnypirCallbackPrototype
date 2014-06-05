@@ -3,4 +3,6 @@
     <item name="contacts_loader" type="id"/>
     <item name="snypir_contacts_loader" type="id"/>
     <item name="contatcs_search_loader" type="id"/>
+    <item name="phones_loader" type="id"/>
+    <item name="contact_info_loader" type="id"/>
 </resources>

@@ -9,14 +9,13 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.snypir.callback.R;
 import com.squareup.picasso.Picasso;
 
-public class ContactsSnypirAdapter extends CursorAdapter {
+public class ContactsSnypirAdapter extends BaseSwipableCursorAdapter {
 
     private final Context mContext;
     private LayoutInflater mInflater;
@@ -56,42 +55,6 @@ public class ContactsSnypirAdapter extends CursorAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-
-        if (convertView == null) {
-            holder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.li_contact, parent, false);
-            holder.name = (TextView) convertView.findViewById(R.id.text1);
-            holder.phone = (TextView) convertView.findViewById(R.id.text2);
-            holder.image = (ImageView) convertView.findViewById(R.id.image);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
-        final Cursor c = getCursor();
-        if (c != null) {
-            c.moveToPosition(position);
-            int nameIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY);
-            int phoneIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-            int imageIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI);
-            holder.name.setText(c.getString(nameIndex));
-            holder.phone.setText(c.getString(phoneIndex));
-            String uri = c.getString(imageIndex);
-            if (!TextUtils.isEmpty(uri)) {
-                Picasso.with(mContext)
-                        .load(Uri.parse(uri))
-                        .placeholder(R.drawable.ic_launcher)
-                        .into(holder.image);
-            } else {
-                holder.image.setImageResource(R.drawable.ic_launcher);
-            }
-        }
-
-        return convertView;
-    }
-
-    @Override
     public View newView(final Context context, final Cursor cursor, final ViewGroup viewGroup) {
         return mInflater.inflate(R.layout.li_fav_contact, viewGroup, false);
     }
@@ -100,14 +63,19 @@ public class ContactsSnypirAdapter extends CursorAdapter {
     public void bindView(final View view, final Context context, final Cursor c) {
         int nameIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY);
         int phoneIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-        ((TextView) view.findViewById(R.id.text1)).setText(getCursor().getString(nameIndex));
-        ((TextView) view.findViewById(R.id.text2)).setText(getCursor().getString(phoneIndex));
-    }
-
-    class ViewHolder {
-        TextView name;
-        TextView phone;
-        ImageView image;
+        int imageIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI);
+        ((TextView) view.findViewById(R.id.text1)).setText(c.getString(nameIndex));
+        ((TextView) view.findViewById(R.id.text2)).setText(c.getString(phoneIndex));
+        ImageView image = (ImageView) view.findViewById(R.id.image);
+        String uri = c.getString(imageIndex);
+        if (!TextUtils.isEmpty(uri)) {
+            Picasso.with(mContext)
+                    .load(Uri.parse(uri))
+                    .placeholder(R.drawable.ic_launcher)
+                    .into(image);
+        } else {
+            image.setImageResource(R.drawable.ic_launcher);
+        }
     }
 
 }
