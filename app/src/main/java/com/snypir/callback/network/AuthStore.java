@@ -1,6 +1,9 @@
 package com.snypir.callback.network;
 
+import com.snypir.callback.preferences.Prefs_;
+
 import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 /**
  * Created by stepangoncarov on 04/06/14.
@@ -8,20 +11,15 @@ import org.androidannotations.annotations.EBean;
 @EBean(scope = EBean.Scope.Singleton)
 public class AuthStore {
 
-    private String Login;
-
-    private String Password;
+    @Pref
+    Prefs_ mPreferences;
 
     public String getUsername() {
-        return Login;
+        return mPreferences.login().get();
     }
 
     public String getPassword() {
-        return Password;
+        return mPreferences.password().get();
     }
 
-    @Override
-    public String toString() {
-        return String.format("{%s, %s}", Login, Password);
-    }
 }

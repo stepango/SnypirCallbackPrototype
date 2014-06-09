@@ -124,10 +124,11 @@ public class ContactsAdapter extends CursorAdapter implements
         if (!TextUtils.isEmpty(uri)) {
             Picasso.with(mContext)
                     .load(Uri.parse(uri))
-                    .placeholder(R.drawable.ic_launcher)
+                    .placeholder(R.drawable.ic_contact_picture)
+                    .error(R.drawable.ic_contact_picture)
                     .into(image);
         } else {
-            image.setImageResource(R.drawable.ic_launcher);
+            Picasso.with(mContext).load(R.drawable.ic_contact_picture).into(image);
         }
     }
 

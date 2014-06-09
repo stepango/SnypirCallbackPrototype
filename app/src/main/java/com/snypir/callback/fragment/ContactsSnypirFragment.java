@@ -3,8 +3,10 @@ package com.snypir.callback.fragment;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 
@@ -14,6 +16,7 @@ import com.snypir.callback.widget.ContactsSnypirAdapter;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
 
 import de.timroes.android.listview.EnhancedListView;
@@ -37,11 +40,11 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
                 final Cursor c = mCursorAdapter.getCursor();
                 if (c != null) {
                     c.moveToPosition(i);
-                    mCursorAdapter.putPendingDismiss(c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID)));
-                    mCursorAdapter.notifyDataSetChanged();
                     final String phone = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     final long rawContactId = c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID));
                     ContentProviderUtils.removePhone(getActivity(), phone);
+                    mCursorAdapter.putPendingDismiss(c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID)));
+                    mCursorAdapter.notifyDataSetChanged();
                     return new EnhancedListView.Undoable() {
                         @Override
                         public void undo() {
@@ -60,6 +63,23 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
         mListView.setAdapter(mCursorAdapter);
         getLoaderManager().initLoader(R.id.snypir_contacts_loader, null, this);
     }
+
+    @ItemClick(R.id.list)
+    void call(int position){
+        final Cursor cursor = mCursorAdapter.getCursor();
+        if (cursor != null) {
+            cursor.moveToPosition(position);
+            startDialActivity(cursor.getString(
+                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
+        }
+    }
+
+    private void startDialActivity(String phone){
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + phone));
+        startActivity(intent);
+    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(final int i, final Bundle bundle) {

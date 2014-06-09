@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 
 import com.snypir.callback.R;
 import com.snypir.callback.activity.ContactInfoActivity_;
+import com.snypir.callback.utils.ContactUtils;
 import com.snypir.callback.widget.ContactsAdapter;
 
 import org.androidannotations.annotations.AfterViews;
@@ -66,9 +67,10 @@ public class ContactsAllFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
         final Cursor c = mCursorAdapter.getCursor();
-        c.moveToPosition(i);
-        ContactInfoActivity_.intent(this).mContactId(
-                c.getLong(c.getColumnIndex(ContactsContract.Contacts._ID))).start();
+        if (c != null) {
+            c.moveToPosition(i);
+            ContactInfoActivity_.intent(this).contactId(ContactUtils.contactId(c)).start();
+        }
     }
 
     private static class PhonesCursorLoader extends CursorLoader {

@@ -12,12 +12,15 @@ import android.widget.ListView;
 import android.widget.SearchView;
 
 import com.snypir.callback.R;
+import com.snypir.callback.activity.ContactInfoActivity_;
 import com.snypir.callback.loader.ContactsPhoneSearchLoader;
+import com.snypir.callback.utils.ContactUtils;
 import com.snypir.callback.widget.ContactsAdapter;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
 
 /**
@@ -63,6 +66,15 @@ public class ContactsSearchFragment extends Fragment implements LoaderManager.Lo
         mList.setAdapter(mAdapter);
     }
 
+    @ItemClick(R.id.list)
+    void showInfo(int position){
+        final Cursor c = mAdapter.getCursor();
+        if (c != null) {
+            c.moveToPosition(position);
+            ContactInfoActivity_.intent(this).contactId(ContactUtils.contactId(c)).start();
+        }
+    }
+
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -72,6 +84,7 @@ public class ContactsSearchFragment extends Fragment implements LoaderManager.Lo
             mSearchView = (SearchView) searchItem.getActionView();
             searchItem.expandActionView();
             mSearchView.setOnQueryTextListener(mListener);
+
         }
     }
 

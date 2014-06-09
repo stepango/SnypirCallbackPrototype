@@ -1,6 +1,5 @@
 package com.snypir.callback.activity;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,14 +18,17 @@ import com.snypir.callback.Extra;
 import com.snypir.callback.R;
 import com.snypir.callback.fragment.CallConfirmDialogFragment;
 import com.snypir.callback.fragment.LoadingDialogFragment;
+import com.snypir.callback.network.AuthData;
 import com.snypir.callback.network.AuthInterceptor;
-import com.snypir.callback.network.AuthStore;
-import com.snypir.callback.network.RegistrationStatus;
+import com.snypir.callback.network.Balance;
+import com.snypir.callback.network.RegistrationData;
+import com.snypir.callback.network.ResponseTemplate;
 import com.snypir.callback.network.RestClient;
 import com.snypir.callback.network.UserAuthData;
 import com.snypir.callback.network.UserMobileData;
 import com.snypir.callback.preferences.Prefs_;
 
+import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
@@ -37,14 +39,18 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
 import org.androidannotations.annotations.sharedpreferences.Pref;
-import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by stepangoncarov on 04/06/14.
  */
 @EActivity(R.layout.ac_login)
-public class LoginActivity extends Activity {
+public class LoginActivity extends BaseActivity {
 
     @RestService
     RestClient client;
@@ -65,7 +71,7 @@ public class LoginActivity extends Activity {
     EditText mEditText;
 
     @InstanceState
-    RegistrationStatus mStatus;
+    ResponseTemplate<RegistrationData> mStatus;
 
     @Pref
     Prefs_ mPreferences;
@@ -92,13 +98,13 @@ public class LoginActivity extends Activity {
                 .unregisterReceiver(mReceiver);
     }
 
-//    @AfterInject
-//    void initAuth() {
-//        RestTemplate template = client.getRestTemplate();
-//        List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
-//        interceptors.add(authInterceptor);
-//        template.setInterceptors(interceptors);
-//    }
+    @AfterInject
+    void initAuth() {
+        RestTemplate template = client.getRestTemplate();
+        List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
+        interceptors.add(authInterceptor);
+        template.setInterceptors(interceptors);
+    }
 
     @AfterViews
     void init() {
@@ -114,7 +120,7 @@ public class LoginActivity extends Activity {
         String operator = mTeleManager.getSimOperatorName();
         try {
             mStatus = client.registerMobileNumber(new UserMobileData(mEditText.getText().toString(), operator));
-        } catch (HttpServerErrorException e) {
+        } catch (RestClientException e) {
             showError(e);
             e.printStackTrace();
         }
@@ -123,16 +129,29 @@ public class LoginActivity extends Activity {
     }
 
     @Background
-    void registerCallback(final String confirmation){
+    void registerCallback(final String confirmation) {
         try {
-            final AuthStore authStore = client.registerCallBackApp(
+            ResponseTemplate<AuthData> authData = client.registerCallBackApp(
                     new UserAuthData(mStatus.getData().getRegistrationNumber(), confirmation));
-            mPreferences.edit()
-                    .login().put(authStore.getUsername())
-                    .password().put(authStore.getPassword())
-                    .apply();
-            Log.d("AUTH", authStore.toString());
+            mPreferences.login().put(authData.getData().getLogin());
+            mPreferences.password().put(authData.getData().getPassword());
+            Log.d("AUTH", authData.toString());
+            getBalance();
         } catch (RestClientException e) {
+            showError(e);
+            e.printStackTrace();
+        }
+    }
+
+    @Background
+    void getBalance() {
+        try {
+            final ResponseTemplate<Balance> balanceResponse = client.getBalance();
+            mPreferences.edit().balance().put(balanceResponse.getData().getBalance()).apply();
+            Log.d("BALANCE", balanceResponse.toString());
+            finish();
+        } catch (RestClientException e) {
+            showError(e);
             e.printStackTrace();
         }
     }
@@ -158,7 +177,7 @@ public class LoginActivity extends Activity {
     }
 
     @UiThread
-    void showError(Exception e){
+    void showError(Exception e) {
         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 

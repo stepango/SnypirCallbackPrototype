@@ -9,7 +9,6 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="16dp"
         android:id="@+id/image"/>
 
     <TextView

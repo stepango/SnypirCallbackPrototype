@@ -27,6 +27,9 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 /**
  * Created by stepangoncarov on 01/06/14.
  */
@@ -36,10 +39,11 @@ public class ContactInfoFragment extends Fragment implements LoaderManager.Loade
     View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(final View view) {
-            ContentProviderUtils.addPhone(getActivity(), (long) view.getTag(), "1-000-REPLACE");
+            ContentProviderUtils.addPhone(getActivity(), (long) view.getTag(),
+                    "1-SNYPIR-" + String.valueOf(new Random().nextInt()).substring(0, 4));
+            init();
         }
     };
-
     @FragmentArg("contactId")
     long mContactId;
 
@@ -55,6 +59,8 @@ public class ContactInfoFragment extends Fragment implements LoaderManager.Loade
     @ViewById(R.id.lay_phones)
     LinearLayout mLayPhones;
 
+    private ArrayList<String> mPhones = new ArrayList<>();
+
     @Click(R.id.btn_call)
     void call() {
 
@@ -67,16 +73,17 @@ public class ContactInfoFragment extends Fragment implements LoaderManager.Loade
 
     @Click(R.id.btn_sent_invitation)
     void invite() {
-        Intent i = new Intent(Intent.ACTION_SEND);
-        i.putExtra(Intent.EXTRA_TEXT, getString(R.string.invitation_text));
-        startActivity(i);
+        Uri uri = Uri.parse("smsto:" + mPhones.get(0));
+        Intent it = new Intent(Intent.ACTION_SENDTO, uri);
+        it.putExtra("sms_body", getString(R.string.invitation_text));
+        startActivity(it);
     }
 
     @AfterViews
     void init() {
         final LoaderManager manager = getLoaderManager();
         if (manager != null) {
-            getLoaderManager().initLoader(R.id.contact_info_loader, null, this);
+            getLoaderManager().restartLoader(R.id.contact_info_loader, null, this);
         }
     }
 
@@ -108,12 +115,12 @@ public class ContactInfoFragment extends Fragment implements LoaderManager.Loade
         final int typeIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
         final long rawContactId = c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID));
         final CharSequence type = getTypeLabel(c, typeIndex);
+        mPhones.add(phone);
         mLayPhones.addView(PhoneView_
                 .build(getActivity())
                 .setTexts(phone, type)
                 .setOnStarClickListener(mOnClickListener)
                 .setRawContactId(rawContactId));
-        mLayPhones.requestLayout();
     }
 
     private CharSequence getTypeLabel(final Cursor c, final int typeIndex) {
@@ -131,6 +138,7 @@ public class ContactInfoFragment extends Fragment implements LoaderManager.Loade
         final String photoUri = c.getString(
                 c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
         mTextName.setText(name);
+        mTextInvite.setText(getString(R.string.send_invitation_description, name));
         if (!TextUtils.isEmpty(photoUri)) {
             Picasso.with(getActivity())
                     .load(Uri.parse(photoUri))

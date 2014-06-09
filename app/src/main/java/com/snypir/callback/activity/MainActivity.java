@@ -1,28 +1,32 @@
 package com.snypir.callback.activity;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.snypir.callback.R;
 import com.snypir.callback.fragment.ContactsAllFragment_;
 import com.snypir.callback.fragment.ContactsSnypirFragment_;
+import com.snypir.callback.preferences.Prefs_;
 import com.snypir.callback.view.SlidingTabLayout;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.Locale;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends Activity implements ActionBar.TabListener {
+public class MainActivity extends BaseActivity implements ActionBar.TabListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -40,12 +44,24 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     @ViewById(R.id.viewpager)
     ViewPager mViewPager;
 
-    @ViewById(R.id.sliding_tabs)
+    @Pref
+    Prefs_ mPreferences;
+
+    @ViewById(R.id.lay_root)
+    LinearLayout mLinearLayout;
+
     SlidingTabLayout mSlidingTabLayout;
 
     @AfterViews
     void init() {
-
+        final ActionBar actionBar = getActionBar();
+        mSlidingTabLayout = new SlidingTabLayout(this);
+        if (actionBar != null) {
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setCustomView(mSlidingTabLayout);
+        }
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
@@ -56,6 +72,23 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         mSlidingTabLayout.setViewPager(mViewPager);
     }
 
+    private void checkLogin() {
+        final View view = findViewById(R.id.lay_register);
+        if (!isLogged()){
+            if (view == null) {
+                mLinearLayout.addView(View.inflate(this, R.layout.btn_register, null));
+            }
+        } else {
+            if (view != null){
+                mLinearLayout.removeView(view);
+            }
+        }
+    }
+
+    private boolean isLogged() {
+        return !TextUtils.isEmpty(mPreferences.login().get()) &&
+                !TextUtils.isDigitsOnly(mPreferences.password().get());
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,6 +116,16 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         SearchActivity_.intent(this).start();
     }
 
+    public void register(View view) {
+        LoginActivity_.intent(this).start();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkLogin();
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -107,7 +150,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
         @Override
         public int getCount() {
-            return 2;
+            return mFragments.length;
         }
 
         @Override
