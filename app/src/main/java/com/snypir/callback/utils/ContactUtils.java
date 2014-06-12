@@ -14,4 +14,16 @@ public class ContactUtils {
         return c.getLong(c.getColumnIndex(ContactsContract.Contacts._ID));
     }
 
+    public static long getPhoneId(final Cursor c) {
+        return c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
+    }
+
+    public static long getRawContactId(final Cursor c) {
+        return c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID));
+    }
+
+    public static String getNumber(final Cursor c) {
+        return c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+    }
+
 }

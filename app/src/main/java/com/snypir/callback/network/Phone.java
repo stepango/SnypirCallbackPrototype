@@ -5,6 +5,10 @@ package com.snypir.callback.network;
  */
 public class Phone {
 
+    public Phone(final String phoneNumber) {
+        PhoneNumber = phoneNumber;
+    }
+
     String PhoneNumber;
 
 }

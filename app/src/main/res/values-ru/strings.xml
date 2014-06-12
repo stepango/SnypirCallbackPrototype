@@ -4,4 +4,5 @@
     <string name="send_invitation">Отправить приглашение</string>
     <string name="send_invitation_description">Когда %s присоеденится к Snypir, Вы сможете общаться бесплатно.</string>
     <string name="invitation_text">Привет! Пишу тебе из Snyper. Найди его где нибудь и обязательно установи!:)</string>
+    <string name="choose_number">Выберите номер</string>
 </resources>

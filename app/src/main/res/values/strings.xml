@@ -18,5 +18,6 @@
     <string name="confirm">Confirm</string>
     <string name="wrong_confirmation_code_try_one_more_time">Wrong confirmation code, try one more time</string>
     <string name="please_register">Please register for better Snypir experience</string>
+    <string name="choose_number">Choose number</string>
 
 </resources>

@@ -9,7 +9,7 @@ public interface Service {
     String CALLBACK = "/Callback";
     String PSTN_CALL_PRICE = "/PstnCallPrice";
     String ABONENT = "/Abonent";
-    String CALLBACK_NUMBERS = "/CallbackNumbers";
+    String CALLBACK_NUMBER = "/CallbackNumber";
     String PROFILE = "/Profile";
 
 }

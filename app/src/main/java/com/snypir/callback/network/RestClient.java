@@ -8,8 +8,8 @@ import org.androidannotations.annotations.rest.Rest;
 import org.androidannotations.api.rest.RestClientSupport;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 
-@Rest(rootUrl = Config.ROOT_URL, converters = { GsonHttpMessageConverter.class })
-public interface RestClient extends RestClientSupport{
+@Rest(rootUrl = Config.ROOT_URL, converters = {GsonHttpMessageConverter.class})
+public interface RestClient extends RestClientSupport {
 
     @Post(Service.REGISTER + "/mobileNumber")
     ResponseTemplate<RegistrationData> registerMobileNumber(UserMobileData data);
@@ -34,5 +34,14 @@ public interface RestClient extends RestClientSupport{
 
     @Get(Service.PROFILE + "/getBalance")
     ResponseTemplate<Balance> getBalance();
+
+    @Post(Service.CALLBACK_NUMBER + "/GetByFavoritePhoneNumber")
+    ResponseTemplate<CallbackNumberInfo> getByFavoritePhoneNumber(Phone phone);
+
+    @Post(Service.CALLBACK_NUMBER + "/CancelFavorite")
+    ResponseTemplate cancelFavorite(Phone phone);
+
+    @Get(Service.CALLBACK_NUMBER + "/getAll")
+    ResponseTemplate<CallbackNumbersList> getAll();
 
 }

@@ -29,6 +29,7 @@ public class ResponseTemplate<T> implements Serializable{
 
     @Override
     public String toString() {
-        return String.format("{isError: %s, Status: %s, Description: %s, Data: %s}", String.valueOf(IsError), Status, Description, Data);
+        return String.format("{isError: %s, Status: %s, Description: %s, Data: %s}",
+                String.valueOf(IsError), Status, Description, Data);
     }
 }

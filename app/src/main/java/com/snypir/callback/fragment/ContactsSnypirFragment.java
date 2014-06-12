@@ -11,13 +11,19 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 
 import com.snypir.callback.R;
+import com.snypir.callback.network.AuthRestClient;
+import com.snypir.callback.network.Phone;
+import com.snypir.callback.utils.ContactUtils;
 import com.snypir.callback.utils.ContentProviderUtils;
 import com.snypir.callback.widget.ContactsSnypirAdapter;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
+import org.springframework.web.client.RestClientException;
 
 import de.timroes.android.listview.EnhancedListView;
 
@@ -30,31 +36,47 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     @ViewById(R.id.list)
     EnhancedListView mListView;
 
+    @Bean
+    AuthRestClient rest;
+
     private ContactsSnypirAdapter mCursorAdapter;
 
-    @AfterViews
-    void init() {
-        mListView.setDismissCallback(new EnhancedListView.OnDismissCallback() {
-            @Override
-            public EnhancedListView.Undoable onDismiss(final EnhancedListView enhancedListView, final int i) {
-                final Cursor c = mCursorAdapter.getCursor();
-                if (c != null) {
-                    c.moveToPosition(i);
-                    final String phone = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    final long rawContactId = c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID));
-                    ContentProviderUtils.removePhone(getActivity(), phone);
-                    mCursorAdapter.putPendingDismiss(c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID)));
+    private EnhancedListView.OnDismissCallback mDismissCallback = new EnhancedListView.OnDismissCallback() {
+        @Override
+        public EnhancedListView.Undoable onDismiss(final EnhancedListView enhancedListView, final int i) {
+            final Cursor c = mCursorAdapter.getCursor();
+            if (c != null) {
+                c.moveToPosition(i);
+                final String number = ContactUtils.getNumber(c);
+                final long rawContactId = ContactUtils.getRawContactId(c);
+                if (ContentProviderUtils.removePhone(getActivity(), number) > 0) {
+                    mCursorAdapter.putPendingDismiss(ContactUtils.getPhoneId(c));
                     mCursorAdapter.notifyDataSetChanged();
+                    removeNumber(number);
                     return new EnhancedListView.Undoable() {
                         @Override
                         public void undo() {
-                            ContentProviderUtils.addPhone(getActivity(), rawContactId, phone);
+                            ContentProviderUtils.addPhone(getActivity(), rawContactId, number);
                         }
                     };
                 }
-                return null;
             }
-        });
+            return null;
+        }
+    };
+
+    @Background
+    void removeNumber(final String number) {
+        try {
+            rest.client.cancelFavorite(new Phone(number));
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @AfterViews
+    void init() {
+        mListView.setDismissCallback(mDismissCallback);
         mListView.setSwipeDirection(EnhancedListView.SwipeDirection.START);
         mListView.setSwipingLayout(R.layout.li_header);
         mListView.enableSwipeToDismiss();
@@ -65,21 +87,19 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     }
 
     @ItemClick(R.id.list)
-    void call(int position){
+    void call(int position) {
         final Cursor cursor = mCursorAdapter.getCursor();
         if (cursor != null) {
             cursor.moveToPosition(position);
-            startDialActivity(cursor.getString(
-                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
+            startDialActivity(ContactUtils.getNumber(cursor));
         }
     }
 
-    private void startDialActivity(String phone){
+    private void startDialActivity(String phone) {
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:" + phone));
         startActivity(intent);
     }
-
 
     @Override
     public Loader<Cursor> onCreateLoader(final int i, final Bundle bundle) {
@@ -88,7 +108,7 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 null,
                 ContactsContract.CommonDataKinds.Phone.LABEL + "=?",
-                new String[]{"Snypir" },
+                new String[]{"Snypir"},
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY + " COLLATE LOCALIZED ASC"
         );
     }

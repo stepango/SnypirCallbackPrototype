@@ -45,10 +45,11 @@ dependencies {
     compile 'org.androidannotations:androidannotations-api:3.+'
     compile 'com.squareup.picasso:picasso:2.3.+'
     compile 'se.emilsjolander:stickylistheaders:2.3.+'
-    compile 'de.timroes.android:EnhancedListView:0.3.2@aar'
+    compile 'de.timroes.android:EnhancedListView:0.3.+@aar'
     compile 'com.nineoldandroids:library:2.4.+'
     compile 'com.google.code.gson:gson:2.2.+'
-    compile "org.springframework.android:spring-android-rest-template:1.0.1+"
+    compile 'org.springframework.android:spring-android-rest-template:1.0.1+'
+    compile 'com.googlecode.libphonenumber:libphonenumber:6.1+'
 }
 
 apt {

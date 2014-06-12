@@ -44,14 +44,4 @@ public class PhoneView extends RelativeLayout {
         return this;
     }
 
-    public PhoneView setOnStarClickListener(OnClickListener listener){
-        mStar.setOnClickListener(listener);
-        return this;
-    }
-
-    public PhoneView setRawContactId(long id){
-        mStar.setTag(id);
-        return this;
-    }
-
 }

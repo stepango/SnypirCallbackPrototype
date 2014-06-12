@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.snypir.callback.Action;
 import com.snypir.callback.Extra;
@@ -19,16 +18,15 @@ import com.snypir.callback.R;
 import com.snypir.callback.fragment.CallConfirmDialogFragment;
 import com.snypir.callback.fragment.LoadingDialogFragment;
 import com.snypir.callback.network.AuthData;
-import com.snypir.callback.network.AuthInterceptor;
+import com.snypir.callback.network.AuthRestClient;
 import com.snypir.callback.network.Balance;
 import com.snypir.callback.network.RegistrationData;
 import com.snypir.callback.network.ResponseTemplate;
-import com.snypir.callback.network.RestClient;
 import com.snypir.callback.network.UserAuthData;
 import com.snypir.callback.network.UserMobileData;
 import com.snypir.callback.preferences.Prefs_;
+import com.snypir.callback.utils.ErrorHandler;
 
-import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
@@ -37,14 +35,8 @@ import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.annotations.rest.RestService;
 import org.androidannotations.annotations.sharedpreferences.Pref;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by stepangoncarov on 04/06/14.
@@ -52,11 +44,11 @@ import java.util.List;
 @EActivity(R.layout.ac_login)
 public class LoginActivity extends BaseActivity {
 
-    @RestService
-    RestClient client;
+    @Bean
+    ErrorHandler errorHandler;
 
     @Bean
-    AuthInterceptor authInterceptor;
+    AuthRestClient rest;
 
     @SystemService
     TelephonyManager mTeleManager;
@@ -98,14 +90,6 @@ public class LoginActivity extends BaseActivity {
                 .unregisterReceiver(mReceiver);
     }
 
-    @AfterInject
-    void initAuth() {
-        RestTemplate template = client.getRestTemplate();
-        List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
-        interceptors.add(authInterceptor);
-        template.setInterceptors(interceptors);
-    }
-
     @AfterViews
     void init() {
         String number = mTeleManager.getLine1Number();
@@ -119,10 +103,12 @@ public class LoginActivity extends BaseActivity {
         showLoadingFragment();
         String operator = mTeleManager.getSimOperatorName();
         try {
-            mStatus = client.registerMobileNumber(new UserMobileData(mEditText.getText().toString(), operator));
+            mStatus = rest.client.registerMobileNumber(new UserMobileData(mEditText.getText().toString(), operator));
+            if (mStatus.isError()) {
+                errorHandler.showInfo(mStatus);
+            }
         } catch (RestClientException e) {
-            showError(e);
-            e.printStackTrace();
+            errorHandler.showInfo(e);
         }
         hideLoadingFragment();
         showConfirmationDialog();
@@ -131,28 +117,34 @@ public class LoginActivity extends BaseActivity {
     @Background
     void registerCallback(final String confirmation) {
         try {
-            ResponseTemplate<AuthData> authData = client.registerCallBackApp(
+            ResponseTemplate<AuthData> authData = rest.client.registerCallBackApp(
                     new UserAuthData(mStatus.getData().getRegistrationNumber(), confirmation));
-            mPreferences.login().put(authData.getData().getLogin());
-            mPreferences.password().put(authData.getData().getPassword());
-            Log.d("AUTH", authData.toString());
-            getBalance();
+            if (authData.isError()) {
+                errorHandler.showInfo(authData);
+            } else {
+                mPreferences.login().put(authData.getData().getLogin());
+                mPreferences.password().put(authData.getData().getPassword());
+                Log.d("AUTH", authData.toString());
+                getBalance();
+            }
         } catch (RestClientException e) {
-            showError(e);
-            e.printStackTrace();
+            errorHandler.showInfo(e);
         }
     }
 
     @Background
     void getBalance() {
         try {
-            final ResponseTemplate<Balance> balanceResponse = client.getBalance();
-            mPreferences.edit().balance().put(balanceResponse.getData().getBalance()).apply();
-            Log.d("BALANCE", balanceResponse.toString());
-            finish();
+            final ResponseTemplate<Balance> balanceResponse = rest.client.getBalance();
+            if (balanceResponse.isError()) {
+                errorHandler.showInfo(balanceResponse);
+            } else {
+                mPreferences.edit().balance().put(balanceResponse.getData().getBalance()).apply();
+                Log.d("BALANCE", balanceResponse.toString());
+                finish();
+            }
         } catch (RestClientException e) {
-            showError(e);
-            e.printStackTrace();
+            errorHandler.showInfo(e);
         }
     }
 
@@ -174,11 +166,6 @@ public class LoginActivity extends BaseActivity {
     @UiThread
     void removeConfirmationDialog() {
         getFragmentManager().beginTransaction().remove(mConfirmationDialog).commit();
-    }
-
-    @UiThread
-    void showError(Exception e) {
-        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
 }

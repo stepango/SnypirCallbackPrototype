@@ -60,6 +60,12 @@
         android:text="@string/call_for_bubbles"
         android:visibility="gone"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_add_to_favorites"
+        android:text="@string/add_to_favorites"/>
+
     <TextView
         android:id="@+id/txt_invite"
         android:layout_width="wrap_content"

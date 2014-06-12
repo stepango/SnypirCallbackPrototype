@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.database.Cursor;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
@@ -15,14 +16,24 @@ import android.widget.LinearLayout;
 import com.snypir.callback.R;
 import com.snypir.callback.fragment.ContactsAllFragment_;
 import com.snypir.callback.fragment.ContactsSnypirFragment_;
+import com.snypir.callback.network.AuthRestClient;
+import com.snypir.callback.network.CallbackNumberInfo;
+import com.snypir.callback.network.CallbackNumbersList;
 import com.snypir.callback.preferences.Prefs_;
+import com.snypir.callback.utils.ContactUtils;
+import com.snypir.callback.utils.ContentProviderUtils;
+import com.snypir.callback.utils.ErrorHandler;
 import com.snypir.callback.view.SlidingTabLayout;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.springframework.web.client.RestClientException;
 
+import java.util.List;
 import java.util.Locale;
 
 @EActivity(R.layout.activity_main)
@@ -50,6 +61,12 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
     @ViewById(R.id.lay_root)
     LinearLayout mLinearLayout;
 
+    @Bean
+    AuthRestClient rest;
+
+    @Bean
+    ErrorHandler errorHandler;
+
     SlidingTabLayout mSlidingTabLayout;
 
     @AfterViews
@@ -74,12 +91,12 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
 
     private void checkLogin() {
         final View view = findViewById(R.id.lay_register);
-        if (!isLogged()){
+        if (!isLogged()) {
             if (view == null) {
                 mLinearLayout.addView(View.inflate(this, R.layout.btn_register, null));
             }
         } else {
-            if (view != null){
+            if (view != null) {
                 mLinearLayout.removeView(view);
             }
         }
@@ -124,6 +141,43 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
     protected void onResume() {
         super.onResume();
         checkLogin();
+        populatePhones();
+    }
+
+    @Background
+    void populatePhones() {
+        if (!isLogged()) {
+            return;
+        }
+        try {
+            final CallbackNumbersList all = rest.client.getAll().getData();
+            fillContacts(all.getCallbackNumbers());
+        } catch (RestClientException e) {
+            errorHandler.showInfo(e);
+        }
+    }
+
+    void fillContacts(List<CallbackNumberInfo> infos) {
+        for (CallbackNumberInfo info : infos) {
+            if (!TextUtils.isEmpty(info.getPhoneNumber())) {
+                fillContact(info);
+            }
+        }
+    }
+
+    void fillContact(CallbackNumberInfo info) {
+        Cursor c = ContentProviderUtils.findPhoneNumber(this, info.getPhoneNumber());
+        if (c == null) {
+            return;
+        }
+        try {
+            if (c.moveToFirst()) {
+                long rawContactId = ContactUtils.getRawContactId(c);
+                ContentProviderUtils.addPhone(this, rawContactId, info.getCallbackNumber());
+            }
+        } finally {
+            c.close();
+        }
     }
 
     /**
