@@ -1,6 +1,7 @@
 package com.snypir.callback.network;
 
 import com.snypir.callback.Config;
+import com.snypir.callback.model.CallbackNumberInfo;
 
 import org.androidannotations.annotations.rest.Get;
 import org.androidannotations.annotations.rest.Post;

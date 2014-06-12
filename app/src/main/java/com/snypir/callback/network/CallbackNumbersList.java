@@ -1,5 +1,7 @@
 package com.snypir.callback.network;
 
+import com.snypir.callback.model.CallbackNumberInfo;
+
 import java.util.List;
 
 /**

@@ -9,10 +9,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.snypir.callback.R;
+import com.snypir.callback.model.CallbackNumberInfo;
 import com.snypir.callback.network.AuthRestClient;
 import com.snypir.callback.network.Phone;
+import com.snypir.callback.network.ResponseTemplate;
 import com.snypir.callback.utils.ContactUtils;
 import com.snypir.callback.utils.ContentProviderUtils;
 import com.snypir.callback.widget.ContactsSnypirAdapter;
@@ -68,7 +71,9 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     @Background
     void removeNumber(final String number) {
         try {
-            rest.client.cancelFavorite(new Phone(number));
+            CallbackNumberInfo info = CallbackNumberInfo.getByCallbackNumber(number);
+            final ResponseTemplate responseTemplate = rest.client.cancelFavorite(new Phone(info.getPhoneNumber()));
+            Log.d("REMOVE", responseTemplate.toString());
         } catch (RestClientException e) {
             e.printStackTrace();
         }

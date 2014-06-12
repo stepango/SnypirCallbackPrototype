@@ -37,9 +37,7 @@ public class ContentProviderUtils {
     }
 
     public static void addPhone(final Context context, final long rawContactId, @NonNull String number) {
-        if (number.length() > 1 && number.charAt(0) != '+') {
-            number = '+' + number;
-        }
+        number = ContactUtils.modifyPhoneNumber(number);
         if (isNumberExists(context, number)){
             return;
         }

@@ -11,8 +11,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.snypir.callback.R;
+import com.snypir.callback.model.CallbackNumberInfo;
 import com.snypir.callback.network.AuthRestClient;
-import com.snypir.callback.network.CallbackNumberInfo;
 import com.snypir.callback.network.Phone;
 import com.snypir.callback.network.ResponseTemplate;
 import com.snypir.callback.utils.ContentProviderUtils;
@@ -56,7 +56,7 @@ public class PhoneChooserDialog extends DialogFragment {
                     rest.client.getByFavoritePhoneNumber(new Phone(numbers[i]));
             Log.d("ADD CALLBACK NUMBER", callbackNumber.toString());
             ContentProviderUtils.addPhone(mContext, rawContactId,
-                    callbackNumber.getData().getCallbackNumber());
+                    callbackNumber.getData().getСallbackNumber());
             if (getFragmentManager() != null) {
                 getFragmentManager().beginTransaction().remove(this).commit();
             }

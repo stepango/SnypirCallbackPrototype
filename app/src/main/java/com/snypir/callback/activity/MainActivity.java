@@ -16,8 +16,8 @@ import android.widget.LinearLayout;
 import com.snypir.callback.R;
 import com.snypir.callback.fragment.ContactsAllFragment_;
 import com.snypir.callback.fragment.ContactsSnypirFragment_;
+import com.snypir.callback.model.CallbackNumberInfo;
 import com.snypir.callback.network.AuthRestClient;
-import com.snypir.callback.network.CallbackNumberInfo;
 import com.snypir.callback.network.CallbackNumbersList;
 import com.snypir.callback.preferences.Prefs_;
 import com.snypir.callback.utils.ContactUtils;
@@ -159,8 +159,11 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
 
     void fillContacts(List<CallbackNumberInfo> infos) {
         for (CallbackNumberInfo info : infos) {
-            if (!TextUtils.isEmpty(info.getPhoneNumber())) {
+            final String number = info.getPhoneNumber();
+            if (!TextUtils.isEmpty(number)) {
                 fillContact(info);
+                info.setCallbackNumber(ContactUtils.modifyPhoneNumber(info.getСallbackNumber()));
+                info.save();
             }
         }
     }
@@ -173,7 +176,7 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
         try {
             if (c.moveToFirst()) {
                 long rawContactId = ContactUtils.getRawContactId(c);
-                ContentProviderUtils.addPhone(this, rawContactId, info.getCallbackNumber());
+                ContentProviderUtils.addPhone(this, rawContactId, info.getСallbackNumber());
             }
         } finally {
             c.close();

@@ -8,9 +8,10 @@ import android.provider.ContactsContract;
  */
 public class ContactUtils {
 
-    private ContactUtils(){}
+    private ContactUtils() {
+    }
 
-    public static long contactId(final Cursor c){
+    public static long contactId(final Cursor c) {
         return c.getLong(c.getColumnIndex(ContactsContract.Contacts._ID));
     }
 
@@ -24,6 +25,13 @@ public class ContactUtils {
 
     public static String getNumber(final Cursor c) {
         return c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+    }
+
+    public static String modifyPhoneNumber(final String number) {
+        if (number.length() > 1 && number.charAt(0) != '+') {
+            return '+' + number;
+        }
+        return number;
     }
 
 }
