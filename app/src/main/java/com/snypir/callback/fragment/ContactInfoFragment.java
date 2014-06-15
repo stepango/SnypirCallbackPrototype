@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.snypir.callback.R;
+import com.snypir.callback.model.TaggedPhone;
 import com.snypir.callback.view.PhoneView_;
 import com.squareup.picasso.Picasso;
 
@@ -50,7 +51,8 @@ public class ContactInfoFragment extends Fragment implements LoaderManager.Loade
     @ViewById(R.id.lay_phones)
     LinearLayout mLayPhones;
 
-    private ArrayList<String> mPhones = new ArrayList<>();
+    private ArrayList<TaggedPhone> phones = new ArrayList<>();
+
     private long mRawContactId;
     private ContentObserver mObserver = new ContentObserver(new Handler()) {
         @Override
@@ -74,7 +76,7 @@ public class ContactInfoFragment extends Fragment implements LoaderManager.Loade
     void addToFavorites() {
         Fragment f = PhoneChooserDialog_
                 .builder()
-                .numbers(mPhones.toArray(new String[mPhones.size()]))
+                .numbers(phones)
                 .rawContactId(mRawContactId)
                 .build();
         if (getFragmentManager() != null) {
@@ -84,7 +86,7 @@ public class ContactInfoFragment extends Fragment implements LoaderManager.Loade
 
     @Click(R.id.btn_sent_invitation)
     void invite() {
-        Uri uri = Uri.parse("smsto:" + mPhones.get(0));
+        Uri uri = Uri.parse("smsto:" + phones.get(0));
         Intent it = new Intent(Intent.ACTION_SENDTO, uri);
         it.putExtra("sms_body", getString(R.string.invitation_text));
         startActivity(it);
@@ -144,7 +146,7 @@ public class ContactInfoFragment extends Fragment implements LoaderManager.Loade
         final String phone = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
         final int typeIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
         final CharSequence type = getTypeLabel(c, typeIndex);
-        mPhones.add(phone);
+        phones.add(new TaggedPhone(phone, (String) type));
         mLayPhones.addView(PhoneView_
                 .build(getActivity())
                 .setTexts(phone, type));

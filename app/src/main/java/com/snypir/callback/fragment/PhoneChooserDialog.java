@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.snypir.callback.R;
 import com.snypir.callback.model.CallbackNumberInfo;
+import com.snypir.callback.model.TaggedPhone;
 import com.snypir.callback.network.AuthRestClient;
 import com.snypir.callback.network.Phone;
 import com.snypir.callback.network.ResponseTemplate;
@@ -24,6 +25,9 @@ import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.UiThread;
 import org.springframework.web.client.RestClientException;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 /**
  * Created by stepangoncarov on 09/06/14.
  */
@@ -31,7 +35,7 @@ import org.springframework.web.client.RestClientException;
 public class PhoneChooserDialog extends DialogFragment {
 
     @FragmentArg
-    String[] numbers;
+    ArrayList<TaggedPhone> numbers;
 
     @FragmentArg
     long rawContactId;
@@ -40,7 +44,6 @@ public class PhoneChooserDialog extends DialogFragment {
     AuthRestClient rest;
 
     Context mContext;
-
     DialogInterface.OnClickListener mOnClickListener = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(final DialogInterface dialogInterface, final int i) {
@@ -48,12 +51,13 @@ public class PhoneChooserDialog extends DialogFragment {
             processNumber(i);
         }
     };
+    ArrayAdapter<TaggedPhone> adapter;
 
     @Background
     void processNumber(final int i) {
-        try{
+        try {
             final ResponseTemplate<CallbackNumberInfo> callbackNumber =
-                    rest.client.getByFavoritePhoneNumber(new Phone(numbers[i]));
+                    rest.client.getByFavoritePhoneNumber(new Phone(numbers.get(i).getPhone()));
             Log.d("ADD CALLBACK NUMBER", callbackNumber.toString());
             ContentProviderUtils.addPhone(mContext, rawContactId,
                     callbackNumber.getData().getСallbackNumber());
@@ -67,13 +71,48 @@ public class PhoneChooserDialog extends DialogFragment {
     }
 
     @Override
+    public void onActivityCreated(final Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        filterNumbers(getActivity());
+    }
+
+    @Background
+    void filterNumbers(final Context context) {
+        Iterator<TaggedPhone> iterator = numbers.iterator();
+        while (iterator.hasNext()) {
+            TaggedPhone s = iterator.next();
+            if (s.isSnypir() || CallbackNumberInfo.getByPhoneNumber(s.getPhone()) != null ||
+                    CallbackNumberInfo.getByCallbackNumber(s.getPhone()) != null) {
+                iterator.remove();
+            }
+        }
+        if (numbers.size() > 0) {
+            populateAdapter();
+        } else {
+            showNoNumbersInfo(context);
+            getFragmentManager().beginTransaction().remove(this).commit();
+        }
+    }
+
+    @UiThread
+    void showNoNumbersInfo(Context context) {
+        Toast.makeText(context, R.string.all_numbers_already_favorite, Toast.LENGTH_SHORT).show();
+    }
+
+    @UiThread
+    void populateAdapter() {
+        adapter.addAll(numbers);
+    }
+
+    @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         final Context context = getActivity();
         if (context != null) {
+            adapter = new ArrayAdapter<>(getActivity(),
+                    android.R.layout.simple_list_item_1);
             return new AlertDialog.Builder(getActivity())
                     .setTitle(getString(R.string.choose_number))
-                    .setAdapter(new ArrayAdapter<>(getActivity(),
-                            android.R.layout.simple_list_item_1, numbers), mOnClickListener)
+                    .setAdapter(adapter, mOnClickListener)
                     .create();
         } else {
             return super.onCreateDialog(savedInstanceState);

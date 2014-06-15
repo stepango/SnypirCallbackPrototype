@@ -5,4 +5,5 @@ package com.snypir.callback;
  */
 public interface Action {
     String CONFIRM = "com.snypir.action.CONFIRM";
+    String RETRY = "com.snypir.action.RETRY";
 }

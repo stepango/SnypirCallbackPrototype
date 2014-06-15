@@ -26,6 +26,7 @@ public class ErrorHandler {
         Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
+    @UiThread
     public void showInfo(ResponseTemplate response) {
         Toast.makeText(
                 mContext,

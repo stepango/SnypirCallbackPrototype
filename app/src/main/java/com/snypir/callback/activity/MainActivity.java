@@ -69,6 +69,10 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
 
     SlidingTabLayout mSlidingTabLayout;
 
+    @Override
+    protected void actionBarInit() {
+    }
+
     @AfterViews
     void init() {
         final ActionBar actionBar = getActionBar();
@@ -91,7 +95,7 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
 
     private void checkLogin() {
         final View view = findViewById(R.id.lay_register);
-        if (!isLogged()) {
+        if (!isUserSignedIn()) {
             if (view == null) {
                 mLinearLayout.addView(View.inflate(this, R.layout.btn_register, null));
             }
@@ -102,7 +106,7 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
         }
     }
 
-    private boolean isLogged() {
+    private boolean isUserSignedIn() {
         return !TextUtils.isEmpty(mPreferences.login().get()) &&
                 !TextUtils.isDigitsOnly(mPreferences.password().get());
     }
@@ -146,7 +150,7 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
 
     @Background
     void populatePhones() {
-        if (!isLogged()) {
+        if (!isUserSignedIn()) {
             return;
         }
         try {
@@ -159,11 +163,15 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
 
     void fillContacts(List<CallbackNumberInfo> infos) {
         for (CallbackNumberInfo info : infos) {
-            final String number = info.getPhoneNumber();
-            if (!TextUtils.isEmpty(number)) {
-                fillContact(info);
-                info.setCallbackNumber(ContactUtils.modifyPhoneNumber(info.getСallbackNumber()));
-                info.save();
+            if (!info.isFavorite()) {
+                ContentProviderUtils.removePhone(this, info.getСallbackNumber());
+            } else {
+                final String number = info.getPhoneNumber();
+                if (!TextUtils.isEmpty(number)) {
+                    fillContact(info);
+                    info.setCallbackNumber(ContactUtils.modifyPhoneNumber(info.getСallbackNumber()));
+                    info.save();
+                }
             }
         }
     }
@@ -181,6 +189,10 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
         } finally {
             c.close();
         }
+    }
+
+    public void startSettingsActivity(MenuItem item) {
+        SettingsActivity_.intent(this).start();
     }
 
     /**

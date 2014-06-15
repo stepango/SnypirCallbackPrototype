@@ -17,7 +17,19 @@
     <string name="plus">+</string>
     <string name="confirm">Confirm</string>
     <string name="wrong_confirmation_code_try_one_more_time">Wrong confirmation code, try one more time</string>
-    <string name="please_register">Please register for better Snypir experience</string>
+    <string name="please_register">Please log in for better Snypir experience</string>
     <string name="choose_number">Choose number</string>
+    <string name="number_deleted">Number deleted</string>
+    <string name="enter_confirmation_code">Enter phones last 4 digits</string>
+    <string name="all_numbers_already_favorite">No numbers to add to Favorites</string>
+    <string name="bubbles">Bubbles</string>
+    <string name="click_to_add_bubbles">Click to get bubbles</string>
+    <string name="callback">Callback</string>
+    <string name="change_callback_status">Change callback status</string>
+    <string name="logout">Log out</string>
+    <string name="contact_info">Contact information</string>
+    <string name="login">Login</string>
+    <string name="purchase">Purchase</string>
+    <string name="retry">Retry</string>
 
 </resources>

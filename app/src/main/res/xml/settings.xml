@@ -1,0 +1,16 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.snypir.callback.preferences.IntTextViewPreference
+        android:key="balance"
+        android:title="@string/bubbles"
+        android:summary="@string/click_to_add_bubbles"
+        android:widgetLayout="@layout/text"
+        />
+
+    <Preference
+        android:key="logout"
+        android:title="@string/logout"
+        />
+
+</PreferenceScreen>

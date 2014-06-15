@@ -13,16 +13,20 @@ import java.util.List;
 @Table(name = "callback_numbers")
 public class CallbackNumberInfo extends Model {
 
-    @Column(name = "callback_number", unique = true,
+    public static final String CALLBACK_NUMBER = "callback_number";
+    public static final String PHONE_NUMBER = "phone_number";
+    public static final String FAVORITE = "favorite";
+
+    @Column(name = CALLBACK_NUMBER, unique = true,
             onNullConflict = Column.ConflictAction.IGNORE,
             onUniqueConflict = Column.ConflictAction.IGNORE,
             onUniqueConflicts = Column.ConflictAction.IGNORE)
     String CallbackNumber;
 
-    @Column(name = "phone_number")
+    @Column(name = PHONE_NUMBER)
     String PhoneNumber;
 
-    @Column(name = "favorite")
+    @Column(name = FAVORITE)
     boolean Favorite;
 
     public CallbackNumberInfo() {
@@ -44,9 +48,17 @@ public class CallbackNumberInfo extends Model {
     }
 
     public static CallbackNumberInfo getByCallbackNumber(final String number) {
+        return getByNumber(CALLBACK_NUMBER, number);
+    }
+
+    public static CallbackNumberInfo getByPhoneNumber(final String number) {
+        return getByNumber(PHONE_NUMBER, number);
+    }
+
+    private static CallbackNumberInfo getByNumber(final String column, final String number) {
         return new Select()
                 .from(CallbackNumberInfo.class)
-                .where("callback_number = ?", number)
+                .where(column + " = ?", number)
                 .executeSingle();
     }
 

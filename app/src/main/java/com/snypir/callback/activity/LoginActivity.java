@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,8 +16,8 @@ import android.widget.EditText;
 import com.snypir.callback.Action;
 import com.snypir.callback.Extra;
 import com.snypir.callback.R;
-import com.snypir.callback.fragment.CallConfirmDialogFragment;
-import com.snypir.callback.fragment.LoadingDialogFragment;
+import com.snypir.callback.fragment.CallConfirmDialogFragment_;
+import com.snypir.callback.fragment.LoadingDialogFragment_;
 import com.snypir.callback.network.AuthData;
 import com.snypir.callback.network.AuthRestClient;
 import com.snypir.callback.network.Balance;
@@ -53,10 +54,8 @@ public class LoginActivity extends BaseActivity {
     @SystemService
     TelephonyManager mTeleManager;
 
-    @Bean(LoadingDialogFragment.class)
     Fragment mLoadingFragment;
 
-    @Bean(CallConfirmDialogFragment.class)
     Fragment mConfirmationDialog;
 
     @ViewById(R.id.edit_phone)
@@ -71,8 +70,13 @@ public class LoginActivity extends BaseActivity {
     BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            final String confirmation = intent.getStringExtra(Extra.CONFIRMATION_CODE);
-            registerCallback(confirmation);
+            final String action = intent.getAction();
+            if (Action.CONFIRM.equals(action)) {
+                final String confirmation = intent.getStringExtra(Extra.CONFIRMATION_CODE);
+                registerCallback(confirmation);
+            } else if (Action.RETRY.equals(action)){
+                register(null);
+            }
         }
     };
 
@@ -81,6 +85,8 @@ public class LoginActivity extends BaseActivity {
         super.onResume();
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mReceiver, new IntentFilter(Action.CONFIRM));
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mReceiver, new IntentFilter(Action.RETRY));
     }
 
     @Override
@@ -92,10 +98,12 @@ public class LoginActivity extends BaseActivity {
 
     @AfterViews
     void init() {
+        mEditText.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
         String number = mTeleManager.getLine1Number();
         if (!TextUtils.isEmpty(number)) {
             mEditText.setText(number);
         }
+        mEditText.requestFocus();
     }
 
     @Background
@@ -103,7 +111,7 @@ public class LoginActivity extends BaseActivity {
         showLoadingFragment();
         String operator = mTeleManager.getSimOperatorName();
         try {
-            mStatus = rest.client.registerMobileNumber(new UserMobileData(mEditText.getText().toString(), operator));
+            mStatus = rest.client.registerMobileNumber(new UserMobileData(getMobileNumber(), operator));
             if (mStatus.isError()) {
                 errorHandler.showInfo(mStatus);
             }
@@ -114,8 +122,13 @@ public class LoginActivity extends BaseActivity {
         showConfirmationDialog();
     }
 
+    String getMobileNumber() {
+        return "+" + mEditText.getText().toString();
+    }
+
     @Background
     void registerCallback(final String confirmation) {
+        showLoadingFragment();
         try {
             ResponseTemplate<AuthData> authData = rest.client.registerCallBackApp(
                     new UserAuthData(mStatus.getData().getRegistrationNumber(), confirmation));
@@ -129,6 +142,7 @@ public class LoginActivity extends BaseActivity {
             }
         } catch (RestClientException e) {
             errorHandler.showInfo(e);
+            hideLoadingFragment();
         }
     }
 
@@ -146,11 +160,17 @@ public class LoginActivity extends BaseActivity {
         } catch (RestClientException e) {
             errorHandler.showInfo(e);
         }
+        hideLoadingFragment();
     }
 
     @UiThread
     void showLoadingFragment() {
-        getFragmentManager().beginTransaction().add(mLoadingFragment, "loading").commit();
+        if (mLoadingFragment == null) {
+            mLoadingFragment = new LoadingDialogFragment_();
+        }
+        if (!mLoadingFragment.isVisible()) {
+            getFragmentManager().beginTransaction().add(mLoadingFragment, "loading").commit();
+        }
     }
 
     @UiThread
@@ -160,12 +180,19 @@ public class LoginActivity extends BaseActivity {
 
     @UiThread
     void showConfirmationDialog() {
-        getFragmentManager().beginTransaction().add(mConfirmationDialog, "confirm").commit();
+        if (mConfirmationDialog == null) {
+            mConfirmationDialog = new CallConfirmDialogFragment_();
+        }
+        if (!mConfirmationDialog.isVisible()) {
+            getFragmentManager().beginTransaction().add(mConfirmationDialog, "confirm").commit();
+        }
     }
 
     @UiThread
     void removeConfirmationDialog() {
-        getFragmentManager().beginTransaction().remove(mConfirmationDialog).commit();
+        if (mConfirmationDialog != null) {
+            getFragmentManager().beginTransaction().remove(mConfirmationDialog).commit();
+        }
     }
 
 }

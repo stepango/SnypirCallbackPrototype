@@ -5,8 +5,8 @@ import com.snypir.callback.R;
 import org.androidannotations.annotations.EActivity;
 
 /**
- * Created by stepangoncarov on 27/05/14.
+ * Created by stepangoncarov on 14/06/14.
  */
-@EActivity(R.layout.ac_search)
-public class SearchActivity extends BaseActivity {
+@EActivity(R.layout.fmt_settings)
+public class SettingsActivity extends BaseActivity{
 }

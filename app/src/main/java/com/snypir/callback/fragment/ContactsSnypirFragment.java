@@ -9,8 +9,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Log;
+import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
+import android.widget.Toast;
 
+import com.snypir.callback.Config;
 import com.snypir.callback.R;
 import com.snypir.callback.model.CallbackNumberInfo;
 import com.snypir.callback.network.AuthRestClient;
@@ -18,6 +21,7 @@ import com.snypir.callback.network.Phone;
 import com.snypir.callback.network.ResponseTemplate;
 import com.snypir.callback.utils.ContactUtils;
 import com.snypir.callback.utils.ContentProviderUtils;
+import com.snypir.callback.utils.ErrorHandler;
 import com.snypir.callback.widget.ContactsSnypirAdapter;
 
 import org.androidannotations.annotations.AfterViews;
@@ -25,6 +29,7 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.springframework.web.client.RestClientException;
 
@@ -42,6 +47,9 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     @Bean
     AuthRestClient rest;
 
+    @Bean
+    ErrorHandler errorHandler;
+
     private ContactsSnypirAdapter mCursorAdapter;
 
     private EnhancedListView.OnDismissCallback mDismissCallback = new EnhancedListView.OnDismissCallback() {
@@ -55,13 +63,8 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
                 if (ContentProviderUtils.removePhone(getActivity(), number) > 0) {
                     mCursorAdapter.putPendingDismiss(ContactUtils.getPhoneId(c));
                     mCursorAdapter.notifyDataSetChanged();
-                    removeNumber(number);
-                    return new EnhancedListView.Undoable() {
-                        @Override
-                        public void undo() {
-                            ContentProviderUtils.addPhone(getActivity(), rawContactId, number);
-                        }
-                    };
+                    removeNumber(number, rawContactId);
+                    return null;
                 }
             }
             return null;
@@ -69,13 +72,19 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     };
 
     @Background
-    void removeNumber(final String number) {
+    void removeNumber(@NonNull final String number, long rawContactId) {
+        //TODO: if getting error from server execute delete request before getting updated numbers from server
         try {
             CallbackNumberInfo info = CallbackNumberInfo.getByCallbackNumber(number);
-            final ResponseTemplate responseTemplate = rest.client.cancelFavorite(new Phone(info.getPhoneNumber()));
-            Log.d("REMOVE", responseTemplate.toString());
+            final ResponseTemplate response = rest.client.cancelFavorite(new Phone(info.getPhoneNumber()));
+            if (response.isError()){
+                errorHandler.showInfo(response);
+            } else {
+                showMessage(R.string.number_deleted);
+            }
         } catch (RestClientException e) {
             e.printStackTrace();
+            errorHandler.showInfo(e);
         }
     }
 
@@ -101,7 +110,7 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     }
 
     private void startDialActivity(String phone) {
-        Intent intent = new Intent(Intent.ACTION_DIAL);
+        Intent intent = new Intent(Intent.ACTION_CALL);
         intent.setData(Uri.parse("tel:" + phone));
         startActivity(intent);
     }
@@ -113,7 +122,7 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 null,
                 ContactsContract.CommonDataKinds.Phone.LABEL + "=?",
-                new String[]{"Snypir"},
+                new String[]{Config.SNYPIR_TAG},
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY + " COLLATE LOCALIZED ASC"
         );
     }
@@ -128,5 +137,17 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     @Override
     public void onLoaderReset(final Loader<Cursor> objectLoader) {
 
+    }
+
+    @UiThread
+    public void showMessage(@StringRes int id){
+        showMessage(getString(id));
+    }
+
+    @UiThread
+    public void showMessage(@NonNull final String msg){
+        if (getActivity() != null) {
+            Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        }
     }
 }

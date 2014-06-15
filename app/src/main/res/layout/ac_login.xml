@@ -1,37 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:layout_centerInParent="true">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/edit_phone"
+        android:layout_width="@dimen/login_fields_width"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_centerInParent="true">
+        android:inputType="phone"
+        />
 
-        <TextView
-            android:layout_width="@dimen/login_fields_width"
-            android:layout_height="wrap_content"
-            android:textAppearance="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
-            android:text="@string/enter_your_phone_number"/>
+    <Button
+        android:layout_width="@dimen/login_fields_width"
+        android:layout_height="wrap_content"
+        android:text="@string/register"
+        android:onClick="register"
+        />
 
-        <EditText
-            android:id="@+id/edit_phone"
-            android:layout_width="@dimen/login_fields_width"
-            android:layout_height="wrap_content"
-            android:inputType="phone"
-            />
-
-        <Button
-            android:layout_width="@dimen/login_fields_width"
-            android:layout_height="wrap_content"
-            android:text="@string/register"
-            android:onClick="register"
-            />
-
-    </LinearLayout>
-
-
-</RelativeLayout>
+</LinearLayout>

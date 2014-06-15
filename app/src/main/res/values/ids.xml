@@ -5,4 +5,5 @@
     <item name="contatcs_search_loader" type="id"/>
     <item name="phones_loader" type="id"/>
     <item name="contact_info_loader" type="id"/>
+    <item name="phones_filter_loader" type="id"/>
 </resources>

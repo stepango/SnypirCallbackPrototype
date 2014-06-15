@@ -9,6 +9,8 @@ import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.snypir.callback.Config;
+
 import java.util.ArrayList;
 
 /**
@@ -50,7 +52,7 @@ public class ContentProviderUtils {
                 .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
                 .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, number)
                 .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_CUSTOM)
-                .withValue(ContactsContract.CommonDataKinds.Phone.LABEL, "Snypir")
+                .withValue(ContactsContract.CommonDataKinds.Phone.LABEL, Config.SNYPIR_TAG)
                 .build());
         try {
             context.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);

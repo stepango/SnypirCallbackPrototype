@@ -25,7 +25,7 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 /**
  * Created by stepangoncarov on 20/05/14.
  */
-@EFragment(R.layout.fmt_list)
+@EFragment(R.layout.fmt_sticky_list)
 public class ContactsAllFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
 
     @ViewById(R.id.list)

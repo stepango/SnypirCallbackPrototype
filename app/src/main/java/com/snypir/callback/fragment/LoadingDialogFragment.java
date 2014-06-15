@@ -2,25 +2,23 @@ package com.snypir.callback.fragment;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.view.Window;
 
-import org.androidannotations.annotations.EBean;
+import com.snypir.callback.R;
+
+import org.androidannotations.annotations.EFragment;
 
 /**
  * Created by stepangoncarov on 04/06/14.
  */
-@EBean
+@EFragment(R.layout.progress)
 public class LoadingDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
-        final ProgressDialog dialog = new ProgressDialog(getActivity());
-
-        dialog.setIndeterminate(true);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(false);
-
+        final Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         return dialog;
     }
 }

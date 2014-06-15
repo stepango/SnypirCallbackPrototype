@@ -3,18 +3,54 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enter phones last 4 digits"/>
+              android:layout_height="match_parent"
+              android:gravity="center"
+    >
 
     <EditText
-        android:layout_width="@dimen/login_fields_width"
+        android:layout_margin="16dp"
+        android:layout_width="@dimen/confirmation_edit_text_width"
         android:layout_height="wrap_content"
         android:id="@+id/edit_digits"
         android:inputType="number"
-        android:maxLength="4"/>
+        android:maxLength="4"
+        android:gravity="center"
+        android:hint="****"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@android:color/holo_blue_light"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_weight="1"
+            android:id="@+id/btn_retry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@android:style/Widget.ActionButton"
+            android:text="@string/retry"/>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="12dp"
+            android:background="@android:color/holo_blue_light"/>
+
+        <Button
+            android:layout_weight="1"
+            android:id="@+id/btn_confirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@android:style/Widget.ActionButton"
+            android:text="@string/confirm"/>
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -14,4 +14,8 @@ public interface Prefs {
 
     int balance();
 
+    boolean callback();
+
+    String number();
+
 }

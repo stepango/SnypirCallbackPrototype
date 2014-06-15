@@ -50,6 +50,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.+'
     compile 'org.springframework.android:spring-android-rest-template:1.0.1+'
     compile 'com.googlecode.libphonenumber:libphonenumber:6.1+'
+    compile 'com.google.android.gms:play-services:4.+'
 }
 
 apt {
