@@ -16,6 +16,6 @@ public interface Prefs {
 
     boolean callback();
 
-    String number();
+    String mainNumbers();
 
 }

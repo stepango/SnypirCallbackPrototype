@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
  */
 public class ContactUtils {
 
+    private static PhoneFormatter sNumberUtil = new PhoneFormatter();
+
     private ContactUtils() {
     }
 
@@ -27,6 +29,14 @@ public class ContactUtils {
     public static String getNumber(@NonNull final Cursor c) {
         return c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
     }
+
+    public static String getFormattedNumber(@NonNull final Cursor c) {
+        final String number = getNumber(c);
+        synchronized (ContactUtils.class){
+             return sNumberUtil.format(number);
+        }
+    }
+
 
     public static String modifyPhoneNumber(@NonNull final String number) {
         if (number.length() > 1 && number.charAt(0) != '+') {

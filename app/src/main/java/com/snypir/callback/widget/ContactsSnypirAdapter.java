@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.snypir.callback.R;
+import com.snypir.callback.utils.ContactUtils;
 import com.squareup.picasso.Picasso;
 
 public class ContactsSnypirAdapter extends BaseSwipableCursorAdapter {
@@ -62,10 +63,9 @@ public class ContactsSnypirAdapter extends BaseSwipableCursorAdapter {
     @Override
     public void bindView(final View view, final Context context, final Cursor c) {
         int nameIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY);
-        int phoneIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
         int imageIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI);
         ((TextView) view.findViewById(R.id.text1)).setText(c.getString(nameIndex));
-        ((TextView) view.findViewById(R.id.text2)).setText(c.getString(phoneIndex));
+        ((TextView) view.findViewById(R.id.text2)).setText(ContactUtils.getFormattedNumber(c));
         ImageView image = (ImageView) view.findViewById(R.id.image);
         String uri = c.getString(imageIndex);
         if (!TextUtils.isEmpty(uri)) {

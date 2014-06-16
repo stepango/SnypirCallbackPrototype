@@ -32,6 +32,6 @@ public class PhonesAdapter extends CursorAdapter {
 
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
-        ((TextView) view.findViewById(android.R.id.text1)).setText(ContactUtils.getNumber(cursor));
+        ((TextView) view.findViewById(android.R.id.text1)).setText(ContactUtils.getFormattedNumber(cursor));
     }
 }

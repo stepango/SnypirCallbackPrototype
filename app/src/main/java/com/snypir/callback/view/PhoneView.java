@@ -7,6 +7,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.snypir.callback.R;
+import com.snypir.callback.utils.PhoneFormatter;
 
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
@@ -16,6 +17,8 @@ import org.androidannotations.annotations.ViewById;
  */
 @EViewGroup(R.layout.li_phone)
 public class PhoneView extends RelativeLayout {
+
+    PhoneFormatter formatter = new PhoneFormatter();
 
     @ViewById(R.id.txt_phone)
     TextView mTxtPhone;
@@ -39,7 +42,7 @@ public class PhoneView extends RelativeLayout {
     }
 
     public PhoneView setTexts(final CharSequence phone, final CharSequence type){
-        mTxtPhone.setText(phone);
+        mTxtPhone.setText(formatter.format((String) phone));
         mTxtType.setText(type);
         return this;
     }
