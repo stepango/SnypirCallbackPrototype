@@ -6,5 +6,6 @@ package com.snypir.callback;
 public interface Extra {
 
     String CONFIRMATION_CODE = "com.snypir.extra.CONFIRMATION_CODE";
+    String RANGE_TYPE = "com.snypir.extra.RANGE_TYPE";
 
 }

@@ -18,6 +18,7 @@ import com.snypir.callback.R;
 import com.squareup.picasso.Picasso;
 
 import org.androidannotations.annotations.EBean;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -109,6 +110,7 @@ public class ContactsAdapter extends CursorAdapter implements
         return c.getLong(c.getColumnIndex(BaseColumns._ID));
     }
 
+    @Nullable
     @Override
     public View newView(final Context context, final Cursor cursor, final ViewGroup viewGroup) {
         return mInflater.inflate(R.layout.li_contact, viewGroup, false);
@@ -132,8 +134,9 @@ public class ContactsAdapter extends CursorAdapter implements
         }
     }
 
+    @Nullable
     @Override
-    public View getHeaderView(int position, View convertView, ViewGroup parent) {
+    public View getHeaderView(int position, @Nullable View convertView, ViewGroup parent) {
         HeaderViewHolder holder;
 
         if (convertView == null) {

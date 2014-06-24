@@ -16,6 +16,8 @@ import com.snypir.callback.R;
 import com.snypir.callback.utils.ContactUtils;
 import com.squareup.picasso.Picasso;
 
+import org.jetbrains.annotations.Nullable;
+
 public class ContactsSnypirAdapter extends BaseSwipableCursorAdapter {
 
     private final Context mContext;
@@ -55,6 +57,7 @@ public class ContactsSnypirAdapter extends BaseSwipableCursorAdapter {
         return c.getLong(c.getColumnIndex(BaseColumns._ID));
     }
 
+    @Nullable
     @Override
     public View newView(final Context context, final Cursor cursor, final ViewGroup viewGroup) {
         return mInflater.inflate(R.layout.li_fav_contact, viewGroup, false);

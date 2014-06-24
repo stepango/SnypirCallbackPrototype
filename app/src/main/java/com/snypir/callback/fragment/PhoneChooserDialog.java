@@ -23,6 +23,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.UiThread;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.web.client.RestClientException;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.Iterator;
 @EFragment
 public class PhoneChooserDialog extends DialogFragment {
 
+    @Nullable
     @FragmentArg
     ArrayList<TaggedPhone> numbers;
 

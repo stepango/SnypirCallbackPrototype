@@ -13,6 +13,7 @@
         android:layout_width="@dimen/login_fields_width"
         android:layout_height="wrap_content"
         android:inputType="phone"
+        android:hint="@string/phone_hint"
         />
 
     <Button

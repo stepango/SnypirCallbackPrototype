@@ -4,6 +4,8 @@ import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Created by stepangoncarov on 08/06/14.
  */
@@ -26,14 +28,15 @@ public class ContactUtils {
         return c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID));
     }
 
+    @Nullable
     public static String getNumber(@NonNull final Cursor c) {
         return c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
     }
 
     public static String getFormattedNumber(@NonNull final Cursor c) {
         final String number = getNumber(c);
-        synchronized (ContactUtils.class){
-             return sNumberUtil.format(number);
+        synchronized (ContactUtils.class) {
+            return sNumberUtil.format(number);
         }
     }
 

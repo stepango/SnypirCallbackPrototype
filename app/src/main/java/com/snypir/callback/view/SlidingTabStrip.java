@@ -24,7 +24,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.LinearLayout;import org.jetbrains.annotations.Nullable;
 
 class SlidingTabStrip extends LinearLayout {
 
@@ -50,7 +50,7 @@ class SlidingTabStrip extends LinearLayout {
     private final SimpleTabColorizer mDefaultTabColorizer;
     private int mSelectedPosition;
     private float mSelectionOffset;
-    private SlidingTabLayout.TabColorizer mCustomTabColorizer;
+    @Nullable private SlidingTabLayout.TabColorizer mCustomTabColorizer;
 
     SlidingTabStrip(Context context) {
         this(context, null);

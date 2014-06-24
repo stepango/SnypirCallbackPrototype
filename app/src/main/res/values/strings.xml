@@ -31,5 +31,13 @@
     <string name="login">Login</string>
     <string name="purchase">Purchase</string>
     <string name="retry">Retry</string>
+    <string name="my_numbers">My numbers</string>
+    <string name="add_number">Add number</string>
+    <string name="account">Account</string>
+    <string name="your_main_number">Your main number</string>
+    <string name="phone_hint">+7 XXX XXX XX-XX</string>
+    <string name="number_should_start_with_plus">Mobile number should start with \'+\'</string>
+    <string name="mobile_number_should_be_11_digits_minimum">Mobile number should be at least 11 digits</string>
+    <string name="secondary_number">Secondary number</string>
 
 </resources>

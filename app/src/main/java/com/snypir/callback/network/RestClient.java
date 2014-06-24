@@ -2,6 +2,8 @@ package com.snypir.callback.network;
 
 import com.snypir.callback.Config;
 import com.snypir.callback.model.CallbackNumberInfo;
+import com.snypir.callback.network.model.AbonentInfo;
+import com.snypir.callback.network.model.AuthData;
 
 import org.androidannotations.annotations.rest.Get;
 import org.androidannotations.annotations.rest.Post;
@@ -44,5 +46,11 @@ public interface RestClient extends RestClientSupport {
 
     @Get(Service.CALLBACK_NUMBER + "/getAll")
     ResponseTemplate<CallbackNumbersList> getAll();
+
+    @Post(Service.PSTN_ACCOUNT + "/Auth")
+    ResponseTemplate authenticate(PhoneNumber number);
+
+    @Post(Service.PSTN_ACCOUNT + "/Add")
+    ResponseTemplate addNumber(SecondaryNumberInfo info);
 
 }

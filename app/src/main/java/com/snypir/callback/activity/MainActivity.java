@@ -29,8 +29,10 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.web.client.RestClientException;
 
 import java.util.List;
@@ -81,6 +83,7 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
             actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setIcon(R.drawable.ic_launcher);
             actionBar.setCustomView(mSlidingTabLayout);
         }
         // Create the adapter that will return a fragment for each of the three
@@ -91,6 +94,7 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         mSlidingTabLayout.setViewPager(mViewPager);
+//        getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(android.R.color.background_dark)));
     }
 
     private void checkLogin() {
@@ -144,6 +148,11 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
     @Override
     protected void onResume() {
         super.onResume();
+        resumeAction();
+    }
+
+    @UiThread
+    public void resumeAction() {
         checkLogin();
         populatePhones();
     }
@@ -222,6 +231,7 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
             return mFragments.length;
         }
 
+        @Nullable
         @Override
         public CharSequence getPageTitle(int position) {
             Locale l = Locale.getDefault();

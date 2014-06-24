@@ -10,7 +10,7 @@ import org.androidannotations.annotations.Extra;
 /**
  * Created by stepangoncarov on 01/06/14.
  */
-@EActivity(R.layout.contact_info)
+@EActivity(R.layout.ac_root)
 public class ContactInfoActivity extends BaseActivity {
 
     @Extra("contactId")

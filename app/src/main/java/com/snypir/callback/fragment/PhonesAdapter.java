@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.snypir.callback.utils.ContactUtils;
 
 import org.androidannotations.annotations.EBean;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by stepangoncarov on 14/06/14.
@@ -25,6 +26,7 @@ public class PhonesAdapter extends CursorAdapter {
         inflater = LayoutInflater.from(context);
     }
 
+    @Nullable
     @Override
     public View newView(final Context context, final Cursor cursor, final ViewGroup viewGroup) {
         return inflater.inflate(android.R.layout.simple_spinner_dropdown_item, viewGroup, false);

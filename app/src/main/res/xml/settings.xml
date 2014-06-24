@@ -1,16 +1,28 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <com.snypir.callback.preferences.IntTextViewPreference
-        android:key="balance"
-        android:title="@string/bubbles"
-        android:summary="@string/click_to_add_bubbles"
-        android:widgetLayout="@layout/text"
-        />
+    <PreferenceCategory
+        android:key="category_numbers"
+        android:title="@string/my_numbers">
+        <Preference
+            android:key="add_number"
+            android:title="@string/add_number"
+            />
+    </PreferenceCategory>
 
-    <Preference
-        android:key="logout"
-        android:title="@string/logout"
-        />
+    <PreferenceCategory android:title="@string/account">
+
+        <com.snypir.callback.preferences.IntTextViewPreference
+            android:key="balance"
+            android:title="@string/bubbles"
+            android:summary="@string/click_to_add_bubbles"
+            android:widgetLayout="@layout/text"
+            />
+
+        <Preference
+            android:key="logout"
+            android:title="@string/logout"
+            />
+    </PreferenceCategory>
 
 </PreferenceScreen>

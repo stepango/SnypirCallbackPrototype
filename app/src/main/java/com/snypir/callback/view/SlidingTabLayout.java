@@ -30,7 +30,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.TextView;import org.jetbrains.annotations.Nullable;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -78,7 +78,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private int mTabViewLayoutId;
     private int mTabViewTextViewId;
 
-    private ViewPager mViewPager;
+    @Nullable private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
 
     private final SlidingTabStrip mTabStrip;
@@ -161,7 +161,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
      * Sets the associated view pager. Note that the assumption here is that the pager content
      * (number of tabs and tab titles) does not change after this call has been made.
      */
-    public void setViewPager(ViewPager viewPager) {
+    public void setViewPager(@Nullable ViewPager viewPager) {
         mTabStrip.removeAllViews();
 
         mViewPager = viewPager;

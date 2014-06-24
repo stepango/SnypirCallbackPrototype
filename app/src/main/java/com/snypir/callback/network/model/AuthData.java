@@ -1,4 +1,4 @@
-package com.snypir.callback.network;
+package com.snypir.callback.network.model;
 
 /**
  * Created by stepangoncarov on 05/06/14.

@@ -20,7 +20,7 @@ public class ContactsPhoneSearchLoader extends CursorLoader {
     public static final String QUERY_KEY = "query";
     private static final String SELECTION =
             "UPPER(" + ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + ") %s";
-    private static final Uri URI = ContactsContract.Contacts.CONTENT_URI;
+    @org.jetbrains.annotations.Nullable private static final Uri URI = ContactsContract.Contacts.CONTENT_URI;
     private static final String SORT_ORDER =
             ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY + " COLLATE LOCALIZED ASC";
     private Pattern mPattern = Pattern.compile("[а-яА-Я]");
