@@ -5,21 +5,28 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.LinearLayout;
 
 import com.snypir.callback.R;
 import com.snypir.callback.fragment.ContactsAllFragment_;
 import com.snypir.callback.fragment.ContactsSnypirFragment_;
+import com.snypir.callback.fragment.DummyFragment_;
 import com.snypir.callback.model.CallbackNumberInfo;
+import com.snypir.callback.model.MyNumber;
+import com.snypir.callback.network.AccountNumbersList;
 import com.snypir.callback.network.AuthRestClient;
 import com.snypir.callback.network.CallbackNumbersList;
+import com.snypir.callback.network.model.PstnAccountInfo;
 import com.snypir.callback.preferences.Prefs_;
+import com.snypir.callback.service.ContactDataUploaderService_;
 import com.snypir.callback.utils.ContactUtils;
 import com.snypir.callback.utils.ContentProviderUtils;
 import com.snypir.callback.utils.ErrorHandler;
@@ -49,16 +56,16 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    SectionsPagerAdapter mSectionsPagerAdapter;
+    SectionsPagerAdapter pagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     @ViewById(R.id.viewpager)
-    ViewPager mViewPager;
+    ViewPager viewPager;
 
     @Pref
-    Prefs_ mPreferences;
+    Prefs_ preferences;
 
     @ViewById(R.id.lay_root)
     LinearLayout mLinearLayout;
@@ -69,7 +76,22 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
     @Bean
     ErrorHandler errorHandler;
 
-    SlidingTabLayout mSlidingTabLayout;
+    SlidingTabLayout tabLayout;
+    private MenuItem settings;
+    private MenuItem register;
+
+    private Runnable initialUploadContacts = new Runnable() {
+        @Override
+        public void run() {
+            uploadContactsInitial();
+        }
+    };
+
+    private void uploadContactsInitial() {
+        if (isUserSignedIn()) {
+            ContactDataUploaderService_.intent(this).addRangeInitial(ContactUtils.getAllNumbers(this)).start();
+        }
+    }
 
     @Override
     protected void actionBarInit() {
@@ -78,47 +100,56 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
     @AfterViews
     void init() {
         final ActionBar actionBar = getActionBar();
-        mSlidingTabLayout = new SlidingTabLayout(this);
+        tabLayout = new SlidingTabLayout(this);
         if (actionBar != null) {
-            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(false);
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setIcon(R.drawable.ic_launcher);
-            actionBar.setCustomView(mSlidingTabLayout);
+            actionBar.setDisplayUseLogoEnabled(false);
+            actionBar.setCustomView(tabLayout);
         }
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
+        pagerAdapter = new SectionsPagerAdapter(getFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        viewPager.setAdapter(pagerAdapter);
 
-        mSlidingTabLayout.setViewPager(mViewPager);
-//        getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(android.R.color.background_dark)));
+        tabLayout.setViewPager(viewPager);
+        getWindow().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#343434")));
     }
 
     private void checkLogin() {
-        final View view = findViewById(R.id.lay_register);
-        if (!isUserSignedIn()) {
-            if (view == null) {
-                mLinearLayout.addView(View.inflate(this, R.layout.btn_register, null));
-            }
-        } else {
-            if (view != null) {
-                mLinearLayout.removeView(view);
-            }
+        initMenuItems();
+    }
+
+    private void initMenuItems() {
+        if (settings != null) {
+            settings.setVisible(isUserSignedIn());
+        }
+        if (register != null) {
+            register.setVisible(!isUserSignedIn());
+        }
+    }
+
+    void uploadContacts(){
+        if (!preferences.isInitialContactsUploaded().get()){
+            AsyncTask.SERIAL_EXECUTOR.execute(initialUploadContacts);
         }
     }
 
     private boolean isUserSignedIn() {
-        return !TextUtils.isEmpty(mPreferences.login().get()) &&
-                !TextUtils.isDigitsOnly(mPreferences.password().get());
+        return !TextUtils.isEmpty(preferences.login().get()) &&
+                !TextUtils.isDigitsOnly(preferences.password().get());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        settings = menu.findItem(R.id.action_settings);
+        register = menu.findItem(R.id.action_register);
+        initMenuItems();
         return true;
     }
 
@@ -126,7 +157,7 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
-        mViewPager.setCurrentItem(tab.getPosition());
+        viewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override
@@ -141,29 +172,49 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
         SearchActivity_.intent(this).start();
     }
 
-    public void register(View view) {
-        LoginActivity_.intent(this).start();
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
         resumeAction();
+        uploadContacts();
     }
 
     @UiThread
     public void resumeAction() {
         checkLogin();
-        populatePhones();
+        populateFriendsPhones();
+        populateMyPhones();
     }
 
     @Background
-    void populatePhones() {
+    void populateMyPhones() {
         if (!isUserSignedIn()) {
             return;
         }
         try {
-            final CallbackNumbersList all = rest.client.getAll().getData();
+            final AccountNumbersList data = rest.client.getAllAccountNumbers().getData();
+            fillMyNumbers(data.getInfos());
+        } catch (RestClientException e) {
+            errorHandler.showInfo(e);
+        }
+    }
+
+    private void fillMyNumbers(final List<PstnAccountInfo> infos) {
+        for (PstnAccountInfo info : infos) {
+            if (!info.isRegistration()) {
+                MyNumber.instantiateSecondary(
+                        ContactUtils.modifyPhoneNumber(info.getPhoneNumber())).save();
+            }
+        }
+    }
+
+    @Background
+    void populateFriendsPhones() {
+        if (!isUserSignedIn()) {
+            return;
+        }
+        try {
+            final CallbackNumbersList all = rest.client.CallbackNumbers().getData();
             fillContacts(all.getCallbackNumbers());
         } catch (RestClientException e) {
             errorHandler.showInfo(e);
@@ -204,6 +255,10 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
         SettingsActivity_.intent(this).start();
     }
 
+    public void register(MenuItem item) {
+        LoginActivity_.intent(this).start();
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -212,7 +267,9 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
 
         String[] mFragments = new String[]{
                 ContactsAllFragment_.class.getName(),
-                ContactsSnypirFragment_.class.getName()
+                ContactsSnypirFragment_.class.getName(),
+                DummyFragment_.class.getName(),
+                DummyFragment_.class.getName()
         };
 
         public SectionsPagerAdapter(FragmentManager fm) {

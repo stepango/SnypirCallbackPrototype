@@ -16,4 +16,8 @@ public interface Prefs {
 
     boolean callback();
 
+    boolean isContactsDumped();
+
+    boolean isInitialContactsUploaded();
+
 }

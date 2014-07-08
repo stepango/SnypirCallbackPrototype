@@ -20,6 +20,7 @@ public interface RestClient extends RestClientSupport {
     @Post(Service.REGISTER + "/callbackApp")
     ResponseTemplate<AuthData> registerCallBackApp(UserAuthData data);
 
+
     @Get(Service.CALLBACK + "/getStatus")
     ResponseTemplate<CallBackStatus> getCallbackStatus();
 
@@ -29,28 +30,39 @@ public interface RestClient extends RestClientSupport {
     @Get(Service.CALLBACK + "/disable")
     ResponseTemplate disableCallback();
 
+
     @Post(Service.PSTN_CALL_PRICE + "/getByPhoneNumber")
     ResponseTemplate<CallPrice> callPriceByPhoneNumber(Phone phone);
+
 
     @Post(Service.ABONENT + "/getInfoByPhoneNumber")
     ResponseTemplate<AbonentInfo> getInfoByPhoneNumber(Phone phone);
 
+
     @Get(Service.PROFILE + "/getBalance")
     ResponseTemplate<Balance> getBalance();
 
-    @Post(Service.CALLBACK_NUMBER + "/GetByFavoritePhoneNumber")
+
+    @Post(Service.CALLBACK_NUMBER + "/getByFavoritePhoneNumber")
     ResponseTemplate<CallbackNumberInfo> getByFavoritePhoneNumber(Phone phone);
 
-    @Post(Service.CALLBACK_NUMBER + "/CancelFavorite")
+    @Post(Service.CALLBACK_NUMBER + "/cancelFavorite")
     ResponseTemplate cancelFavorite(Phone phone);
 
     @Get(Service.CALLBACK_NUMBER + "/getAll")
-    ResponseTemplate<CallbackNumbersList> getAll();
+    ResponseTemplate<CallbackNumbersList> CallbackNumbers();
 
-    @Post(Service.PSTN_ACCOUNT + "/Auth")
+
+    @Post(Service.PSTN_ACCOUNT + "/auth")
     ResponseTemplate authenticate(PhoneNumber number);
 
-    @Post(Service.PSTN_ACCOUNT + "/Add")
+    @Post(Service.PSTN_ACCOUNT + "/add")
     ResponseTemplate addNumber(SecondaryNumberInfo info);
+
+    @Get(Service.PSTN_ACCOUNT + "/getAll")
+    ResponseTemplate<AccountNumbersList> getAllAccountNumbers();
+
+    @Post(Service.CONTACT_PHONE_NUMBER + "/addRange")
+    ResponseTemplate addRange(PhoneNumbers numbers);
 
 }

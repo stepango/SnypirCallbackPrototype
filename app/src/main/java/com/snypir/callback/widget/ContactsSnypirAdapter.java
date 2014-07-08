@@ -2,6 +2,7 @@ package com.snypir.callback.widget;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
@@ -9,6 +10,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,10 +20,11 @@ import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.Nullable;
 
-public class ContactsSnypirAdapter extends BaseSwipableCursorAdapter {
+public class ContactsSnypirAdapter extends CursorAdapter {
 
     private final Context mContext;
     private LayoutInflater mInflater;
+    private boolean[] selection;
 
     public ContactsSnypirAdapter(Context context) {
         super(context, null, true);
@@ -59,6 +62,21 @@ public class ContactsSnypirAdapter extends BaseSwipableCursorAdapter {
 
     @Nullable
     @Override
+    public Cursor swapCursor(final Cursor newCursor) {
+        Cursor cursor = super.swapCursor(newCursor);;
+        clearSelection(cursor);
+        return cursor;
+    }
+
+    public void select(int i){
+        if (selection != null){
+            selection[i] = !selection[i];
+        }
+        notifyDataSetChanged();
+    }
+
+    @Nullable
+    @Override
     public View newView(final Context context, final Cursor cursor, final ViewGroup viewGroup) {
         return mInflater.inflate(R.layout.li_fav_contact, viewGroup, false);
     }
@@ -67,6 +85,7 @@ public class ContactsSnypirAdapter extends BaseSwipableCursorAdapter {
     public void bindView(final View view, final Context context, final Cursor c) {
         int nameIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY);
         int imageIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI);
+        view.findViewById(R.id.lay_root).setFocusable(isItemSelected(c.getPosition()));
         ((TextView) view.findViewById(R.id.text1)).setText(c.getString(nameIndex));
         ((TextView) view.findViewById(R.id.text2)).setText(ContactUtils.getFormattedNumber(c));
         ImageView image = (ImageView) view.findViewById(R.id.image);
@@ -82,4 +101,29 @@ public class ContactsSnypirAdapter extends BaseSwipableCursorAdapter {
         }
     }
 
+    private boolean isItemSelected(final int position) {
+        return selection != null && selection[position];
+    }
+
+    private int getBackGround(final int position){
+        return isItemSelected(position) ? mContext.getResources().getColor(R.color.blue) : Color.WHITE;
+    }
+
+    public void clearSelection(){
+        Cursor c = getCursor();
+        clearSelection(c);
+    }
+
+    private void clearSelection(final Cursor c){
+        if (c != null) {
+            selection = new boolean[c.getCount()];
+        } else {
+            selection = null;
+        }
+        notifyDataSetChanged();
+    }
+
+    public boolean[] getSelection() {
+        return selection;
+    }
 }

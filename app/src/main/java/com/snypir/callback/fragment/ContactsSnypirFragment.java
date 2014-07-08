@@ -11,6 +11,11 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.snypir.callback.Config;
@@ -29,20 +34,19 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.springframework.web.client.RestClientException;
 
-import de.timroes.android.listview.EnhancedListView;
-
 /**
  * Created by stepangoncarov on 20/05/14.
  */
-@EFragment(R.layout.fmt_enchanced_list)
+@EFragment(R.layout.fmt_list)
 public class ContactsSnypirFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @ViewById(R.id.list)
-    EnhancedListView mListView;
+    ListView mListView;
 
     @Bean
     AuthRestClient rest;
@@ -51,23 +55,44 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     ErrorHandler errorHandler;
 
     private ContactsSnypirAdapter mCursorAdapter;
+    private ActionMode mActionMode;
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
-    private EnhancedListView.OnDismissCallback mDismissCallback = new EnhancedListView.OnDismissCallback() {
+        // Called when the action mode is created; startActionMode() was called
         @Override
-        public EnhancedListView.Undoable onDismiss(final EnhancedListView enhancedListView, final int i) {
-            final Cursor c = mCursorAdapter.getCursor();
-            if (c != null) {
-                c.moveToPosition(i);
-                final String number = ContactUtils.getNumber(c);
-                final long rawContactId = ContactUtils.getRawContactId(c);
-                if (ContentProviderUtils.removePhone(getActivity(), number) > 0) {
-                    mCursorAdapter.putPendingDismiss(ContactUtils.getPhoneId(c));
-                    mCursorAdapter.notifyDataSetChanged();
-                    removeNumber(number, rawContactId);
-                    return null;
-                }
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // Inflate a menu resource providing context menu items
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.snypir_contacts_context_menu, menu);
+            mode.setTitle(R.string.choose_items_to_delete);
+            return true;
+        }
+
+        // Called each time the action mode is shown. Always called after onCreateActionMode, but
+        // may be called multiple times if the mode is invalidated.
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false; // Return false if nothing is done
+        }
+
+        // Called when the user selects a contextual menu item
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_delete:
+                    deleteSelectedItems();
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                default:
+                    return false;
             }
-            return null;
+        }
+
+        // Called when the user exits the action mode
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null;
+            mCursorAdapter.clearSelection();
         }
     };
 
@@ -77,7 +102,7 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
         try {
             CallbackNumberInfo info = CallbackNumberInfo.getByCallbackNumber(number);
             final ResponseTemplate response = rest.client.cancelFavorite(new Phone(info.getPhoneNumber()));
-            if (response.isError()){
+            if (response.isError()) {
                 errorHandler.showInfo(response);
             } else {
                 showMessage(R.string.number_deleted);
@@ -90,22 +115,33 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
 
     @AfterViews
     void init() {
-        mListView.setDismissCallback(mDismissCallback);
-        mListView.setSwipeDirection(EnhancedListView.SwipeDirection.START);
-        mListView.setSwipingLayout(R.layout.li_header);
-        mListView.enableSwipeToDismiss();
         mListView.setFastScrollEnabled(true);
         mCursorAdapter = new ContactsSnypirAdapter(getActivity());
         mListView.setAdapter(mCursorAdapter);
         getLoaderManager().initLoader(R.id.snypir_contacts_loader, null, this);
     }
 
+    @ItemLongClick(R.id.list)
+    void initContextMenu(Cursor clickedItem) {
+        if (mActionMode != null) {
+            return;
+        }
+
+        // Start the CAB using the ActionMode.Callback defined above
+        mActionMode = getActivity().startActionMode(mActionModeCallback);
+        mCursorAdapter.select(clickedItem.getPosition());
+    }
+
     @ItemClick(R.id.list)
     void call(int position) {
-        final Cursor cursor = mCursorAdapter.getCursor();
-        if (cursor != null) {
-            cursor.moveToPosition(position);
-            startDialActivity(ContactUtils.getNumber(cursor));
+        if (mActionMode == null) {
+            final Cursor cursor = mCursorAdapter.getCursor();
+            if (cursor != null) {
+                cursor.moveToPosition(position);
+                startDialActivity(ContactUtils.getNumber(cursor));
+            }
+        } else {
+            mCursorAdapter.select(position);
         }
     }
 
@@ -140,14 +176,33 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     }
 
     @UiThread
-    public void showMessage(@StringRes int id){
+    public void showMessage(@StringRes int id) {
         showMessage(getString(id));
     }
 
     @UiThread
-    public void showMessage(@NonNull final String msg){
+    public void showMessage(@NonNull final String msg) {
         if (getActivity() != null) {
             Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void deleteSelectedItems() {
+        final Cursor c = mCursorAdapter.getCursor();
+        if (c == null) {
+            return;
+        }
+        final boolean[] selection = mCursorAdapter.getSelection();
+        for (int i = 0, selectionLength = selection.length; i < selectionLength; i++) {
+            if (selection[i]) {
+                c.moveToPosition(i);
+                final String number = ContactUtils.getNumber(c);
+                final long rawContactId = ContactUtils.getRawContactId(c);
+                if (ContentProviderUtils.removePhone(getActivity(), number) > 0) {
+                    removeNumber(number, rawContactId);
+                }
+            }
+        }
+
     }
 }

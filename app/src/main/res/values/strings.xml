@@ -39,5 +39,7 @@
     <string name="number_should_start_with_plus">Mobile number should start with \'+\'</string>
     <string name="mobile_number_should_be_11_digits_minimum">Mobile number should be at least 11 digits</string>
     <string name="secondary_number">Secondary number</string>
+    <string name="delete">Delete</string>
+    <string name="choose_items_to_delete">Choose items to delete</string>
 
 </resources>

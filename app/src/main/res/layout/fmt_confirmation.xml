@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:gravity="center"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
 
     <EditText
-        android:layout_margin="16dp"
+        android:id="@+id/edit_digits"
         android:layout_width="@dimen/confirmation_edit_text_width"
         android:layout_height="wrap_content"
-        android:id="@+id/edit_digits"
-        android:inputType="number"
-        android:maxLength="4"
+        android:layout_margin="16dp"
         android:gravity="center"
-        android:hint="****"/>
+        android:hint="****"
+        android:inputType="number"
+        android:maxLength="4" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:background="@android:color/holo_blue_light"/>
+        android:background="@android:color/holo_blue_light" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,26 +29,26 @@
         android:orientation="horizontal">
 
         <Button
-            android:layout_weight="1"
             android:id="@+id/btn_retry"
+            style="@android:style/Widget.ActionButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@android:style/Widget.ActionButton"
-            android:text="@string/retry"/>
+            android:layout_weight="1"
+            android:text="@string/retry" />
 
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:layout_marginBottom="12dp"
-            android:background="@android:color/holo_blue_light"/>
+            android:background="@android:color/holo_blue_light" />
 
         <Button
-            android:layout_weight="1"
             android:id="@+id/btn_confirm"
+            style="@android:style/Widget.ActionButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@android:style/Widget.ActionButton"
-            android:text="@string/confirm"/>
+            android:layout_weight="1"
+            android:text="@string/confirm" />
 
     </LinearLayout>
 

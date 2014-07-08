@@ -1,6 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.snypir.callback.activity.MainActivity">
+
+    <item
+        android:id="@+id/action_register"
+        android:title="@string/please_register"
+        android:onClick="register"
+        android:showAsAction="withText|always"
+        />
+
     <item
         android:id="@+id/action_search"
         android:title="@string/search"

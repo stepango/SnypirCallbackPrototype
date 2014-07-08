@@ -12,5 +12,6 @@ public interface Service {
     String CALLBACK_NUMBER = "/CallbackNumber";
     String PROFILE = "/Profile";
     String PSTN_ACCOUNT = "/PstnAccount";
+    String CONTACT_PHONE_NUMBER = "/ContactPhoneNumber";
 
 }

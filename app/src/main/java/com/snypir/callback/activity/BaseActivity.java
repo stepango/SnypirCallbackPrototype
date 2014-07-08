@@ -2,12 +2,15 @@ package com.snypir.callback.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.snypir.callback.App_;
+import com.snypir.callback.service.ContactDataUploaderService_;
 
 /**
  * Created by stepangoncarov on 09/06/14.
@@ -43,5 +46,15 @@ public class BaseActivity extends Activity {
 
         // Send a screen view.
         t.send(new HitBuilders.AppViewBuilder().build());
+    }
+
+    public boolean isUploadServiceRunning(){
+        ActivityManager manager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (ContactDataUploaderService_.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

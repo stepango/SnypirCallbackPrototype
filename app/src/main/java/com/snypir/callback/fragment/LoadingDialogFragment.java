@@ -18,6 +18,7 @@ public class LoadingDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         final Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.setCancelable(false);
         dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         return dialog;
     }

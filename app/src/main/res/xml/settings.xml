@@ -12,7 +12,7 @@
 
     <PreferenceCategory android:title="@string/account">
 
-        <com.snypir.callback.preferences.IntTextViewPreference
+        <com.snypir.callback.widget.IntTextViewPreference
             android:key="balance"
             android:title="@string/bubbles"
             android:summary="@string/click_to_add_bubbles"

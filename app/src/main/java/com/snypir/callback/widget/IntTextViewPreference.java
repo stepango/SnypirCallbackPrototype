@@ -1,4 +1,4 @@
-package com.snypir.callback.preferences;
+package com.snypir.callback.widget;
 
 import android.content.Context;
 import android.preference.Preference;

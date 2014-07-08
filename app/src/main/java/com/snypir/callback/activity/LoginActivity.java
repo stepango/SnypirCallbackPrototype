@@ -57,27 +57,27 @@ public class LoginActivity extends BaseActivity {
     AuthRestClient rest;
 
     @SystemService
-    TelephonyManager mTeleManager;
+    TelephonyManager teleManager;
 
-    Fragment mLoadingFragment;
+    Fragment loadingFragment;
 
-    Fragment mConfirmationDialog;
+    Fragment confirmationDialog;
 
     @ViewById(R.id.edit_phone)
-    EditText mEditText;
+    EditText editText;
 
     @Nullable
     @InstanceState
     String registrationNumber;
 
     @Pref
-    Prefs_ mPreferences;
+    Prefs_ preferences;
 
     @org.androidannotations.annotations.Extra
     boolean primary = true;
 
     @Nullable
-    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+    BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             final String action = intent.getAction();
@@ -98,26 +98,26 @@ public class LoginActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mReceiver, new IntentFilter(Action.CONFIRM));
+                .registerReceiver(receiver, new IntentFilter(Action.CONFIRM));
         LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mReceiver, new IntentFilter(Action.RETRY));
+                .registerReceiver(receiver, new IntentFilter(Action.RETRY));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this)
-                .unregisterReceiver(mReceiver);
+                .unregisterReceiver(receiver);
     }
 
     @AfterViews
     void init() {
-        mEditText.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
-        String number = mTeleManager.getLine1Number();
+        editText.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
+        String number = teleManager.getLine1Number();
         if (!TextUtils.isEmpty(number)) {
-            mEditText.setText(number);
+            editText.setText(number);
         }
-        mEditText.requestFocus();
+        editText.requestFocus();
     }
 
     @Background
@@ -127,7 +127,7 @@ public class LoginActivity extends BaseActivity {
             return;
         }
         showLoadingFragment();
-        String operator = mTeleManager.getSimOperatorName();
+        String operator = teleManager.getSimOperatorName();
         try {
             ResponseTemplate status;
             if (primary) {
@@ -152,21 +152,21 @@ public class LoginActivity extends BaseActivity {
 
     @UiThread
     void showEditTextError(int id) {
-        mEditText.setError(getString(id));
+        editText.setError(getString(id));
     }
 
     private String getMobileNumber() {
-        Editable e = mEditText.getText();
+        Editable e = editText.getText();
         if (e == null) {
             return "";
         }
-        return mEditText.getText().toString().replaceAll("[^\\d^+]", "");
+        return editText.getText().toString().replaceAll("[^\\d^+]", "");
     }
 
     @Background
     void addNumber(final String confirmation) {
         try {
-            String operator = mTeleManager.getSimOperatorName();
+            String operator = teleManager.getSimOperatorName();
             final ResponseTemplate status =
                     rest.client.addNumber(new SecondaryNumberInfo(registrationNumber, operator, confirmation));
             if (status.isError()) {
@@ -189,8 +189,8 @@ public class LoginActivity extends BaseActivity {
             if (authData.isError()) {
                 errorHandler.showInfo(authData);
             } else {
-                mPreferences.login().put(authData.getData().getLogin());
-                mPreferences.password().put(authData.getData().getPassword());
+                preferences.login().put(authData.getData().getLogin());
+                preferences.password().put(authData.getData().getPassword());
                 Log.d("AUTH", authData.toString());
                 getBalance();
             }
@@ -207,7 +207,7 @@ public class LoginActivity extends BaseActivity {
             if (balanceResponse.isError()) {
                 errorHandler.showInfo(balanceResponse);
             } else {
-                mPreferences.edit().balance().put(balanceResponse.getData().getBalance()).apply();
+                preferences.edit().balance().put(balanceResponse.getData().getBalance()).apply();
                 Log.d("BALANCE", balanceResponse.toString());
                 finish();
             }
@@ -219,33 +219,33 @@ public class LoginActivity extends BaseActivity {
 
     @UiThread
     void showLoadingFragment() {
-        if (mLoadingFragment == null) {
-            mLoadingFragment = new LoadingDialogFragment_();
+        if (loadingFragment == null) {
+            loadingFragment = new LoadingDialogFragment_();
         }
-        if (!mLoadingFragment.isVisible()) {
-            getFragmentManager().beginTransaction().add(mLoadingFragment, "loading").commit();
+        if (!loadingFragment.isVisible()) {
+            getFragmentManager().beginTransaction().add(loadingFragment, "loading").commit();
         }
     }
 
     @UiThread
     void hideLoadingFragment() {
-        getFragmentManager().beginTransaction().remove(mLoadingFragment).commit();
+        getFragmentManager().beginTransaction().remove(loadingFragment).commit();
     }
 
     @UiThread
     void showConfirmationDialog() {
-        if (mConfirmationDialog == null) {
-            mConfirmationDialog = new CallConfirmDialogFragment_();
+        if (confirmationDialog == null) {
+            confirmationDialog = new CallConfirmDialogFragment_();
         }
-        if (!mConfirmationDialog.isVisible()) {
-            getFragmentManager().beginTransaction().add(mConfirmationDialog, "confirm").commit();
+        if (!confirmationDialog.isVisible()) {
+            getFragmentManager().beginTransaction().add(confirmationDialog, "confirm").commit();
         }
     }
 
     @UiThread
     void removeConfirmationDialog() {
-        if (mConfirmationDialog != null) {
-            getFragmentManager().beginTransaction().remove(mConfirmationDialog).commit();
+        if (confirmationDialog != null) {
+            getFragmentManager().beginTransaction().remove(confirmationDialog).commit();
         }
     }
 
