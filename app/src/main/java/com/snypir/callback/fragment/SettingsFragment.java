@@ -1,5 +1,6 @@
 package com.snypir.callback.fragment;
 
+import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -36,13 +37,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     PhoneFormatter formatter = new PhoneFormatter();
 
     @Override
-    public void onResume() {
-        super.onResume();
-        init();
-    }
-
-    private void init() {
-
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
         final PreferenceCategory numbers = (PreferenceCategory) findPreference(CATEGORY_NUMBERS);
         final Preference preference = makeMyNumberPreference();

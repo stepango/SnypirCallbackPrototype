@@ -5,4 +5,6 @@
     <dimen name="login_fields_width">240dp</dimen>
     <dimen name="divider_height">2dp</dimen>
     <dimen name="confirmation_edit_text_width">120dp</dimen>
+    <dimen name="search_view_height">48dp</dimen>
+    <dimen name="credit_price_offset">8dp</dimen>
 </resources>

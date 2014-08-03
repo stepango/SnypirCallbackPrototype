@@ -1,5 +1,7 @@
 package com.snypir.callback.activity;
 
+import android.app.Fragment;
+
 import org.androidannotations.annotations.EActivity;
 
 /**
@@ -7,4 +9,8 @@ import org.androidannotations.annotations.EActivity;
  */
 @EActivity
 public class PurchaseActivity extends BaseActivity{
+    @Override
+    public Fragment getBaseFragment() {
+        return null;
+    }
 }

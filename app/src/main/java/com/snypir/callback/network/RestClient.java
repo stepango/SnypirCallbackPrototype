@@ -49,8 +49,8 @@ public interface RestClient extends RestClientSupport {
     @Post(Service.CALLBACK_NUMBER + "/cancelFavorite")
     ResponseTemplate cancelFavorite(Phone phone);
 
-    @Get(Service.CALLBACK_NUMBER + "/getAll")
-    ResponseTemplate<CallbackNumbersList> CallbackNumbers();
+    @Get(Service.CALLBACK_NUMBER + "/getAllNumbers")
+    ResponseTemplate<CallbackNumbersList> getAllNumbers();
 
 
     @Post(Service.PSTN_ACCOUNT + "/auth")

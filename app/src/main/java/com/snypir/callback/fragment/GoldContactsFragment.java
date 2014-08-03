@@ -8,7 +8,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.ActionMode;
@@ -18,16 +17,17 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.snypir.callback.Config;
+import com.activeandroid.content.ContentProvider;
 import com.snypir.callback.R;
 import com.snypir.callback.model.CallbackNumberInfo;
+import com.snypir.callback.model.GoldNumber;
 import com.snypir.callback.network.AuthRestClient;
 import com.snypir.callback.network.Phone;
 import com.snypir.callback.network.ResponseTemplate;
 import com.snypir.callback.utils.ContactUtils;
 import com.snypir.callback.utils.ContentProviderUtils;
 import com.snypir.callback.utils.ErrorHandler;
-import com.snypir.callback.widget.ContactsSnypirAdapter;
+import com.snypir.callback.widget.GoldContactsAdapter;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -43,7 +43,7 @@ import org.springframework.web.client.RestClientException;
  * Created by stepangoncarov on 20/05/14.
  */
 @EFragment(R.layout.fmt_list)
-public class ContactsSnypirFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class GoldContactsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @ViewById(R.id.list)
     ListView mListView;
@@ -54,7 +54,7 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     @Bean
     ErrorHandler errorHandler;
 
-    private ContactsSnypirAdapter mCursorAdapter;
+    private GoldContactsAdapter mCursorAdapter;
     private ActionMode mActionMode;
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
@@ -116,9 +116,9 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
     @AfterViews
     void init() {
         mListView.setFastScrollEnabled(true);
-        mCursorAdapter = new ContactsSnypirAdapter(getActivity());
+        mCursorAdapter = new GoldContactsAdapter(getActivity());
         mListView.setAdapter(mCursorAdapter);
-        getLoaderManager().initLoader(R.id.snypir_contacts_loader, null, this);
+        getLoaderManager().initLoader(R.id.gold_contacts_loader, null, this);
     }
 
     @ItemLongClick(R.id.list)
@@ -138,7 +138,7 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
             final Cursor cursor = mCursorAdapter.getCursor();
             if (cursor != null) {
                 cursor.moveToPosition(position);
-                startDialActivity(ContactUtils.getNumber(cursor));
+                startDialActivity(cursor.getString(cursor.getColumnIndex(GoldNumber.CALLBACK_NUMBER)));
             }
         } else {
             mCursorAdapter.select(position);
@@ -153,19 +153,18 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
 
     @Override
     public Loader<Cursor> onCreateLoader(final int i, final Bundle bundle) {
-        return new CursorLoader(
-                getActivity(),
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                null,
-                ContactsContract.CommonDataKinds.Phone.LABEL + "=?",
-                new String[]{Config.SNYPIR_TAG},
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY + " COLLATE LOCALIZED ASC"
-        );
+        if (i == R.id.gold_contacts_loader) {
+            return new CursorLoader(getActivity(),
+                    ContentProvider.createUri(GoldNumber.class, null),
+                    null, null, null, GoldNumber.NAME + " ASC"
+            );
+        }
+        return null;
     }
 
     @Override
     public void onLoadFinished(final Loader<Cursor> loader, final Cursor c) {
-        if (loader.getId() == R.id.snypir_contacts_loader) {
+        if (loader.getId() == R.id.gold_contacts_loader) {
             mCursorAdapter.swapCursor(c);
         }
     }
@@ -189,17 +188,19 @@ public class ContactsSnypirFragment extends Fragment implements LoaderManager.Lo
 
     private void deleteSelectedItems() {
         final Cursor c = mCursorAdapter.getCursor();
-        if (c == null) {
+        final boolean[] selection = mCursorAdapter.getSelection();
+        if (c == null || selection == null) {
             return;
         }
-        final boolean[] selection = mCursorAdapter.getSelection();
         for (int i = 0, selectionLength = selection.length; i < selectionLength; i++) {
             if (selection[i]) {
                 c.moveToPosition(i);
                 final String number = ContactUtils.getNumber(c);
                 final long rawContactId = ContactUtils.getRawContactId(c);
                 if (ContentProviderUtils.removePhone(getActivity(), number) > 0) {
-                    removeNumber(number, rawContactId);
+                    if (number != null) {
+                        removeNumber(number, rawContactId);
+                    }
                 }
             }
         }

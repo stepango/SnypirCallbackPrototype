@@ -1,26 +1,27 @@
 package com.snypir.callback.activity;
 
-import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 
 import com.snypir.callback.R;
+import com.snypir.callback.fragment.BlueContactsFragment_;
 import com.snypir.callback.fragment.ContactsAllFragment_;
-import com.snypir.callback.fragment.ContactsSnypirFragment_;
 import com.snypir.callback.fragment.DummyFragment_;
-import com.snypir.callback.model.CallbackNumberInfo;
+import com.snypir.callback.fragment.GoldContactsFragment_;
+import com.snypir.callback.fragment.SettingsFragment_;
+import com.snypir.callback.model.BlueNumber;
+import com.snypir.callback.model.GoldNumber;
 import com.snypir.callback.model.MyNumber;
+import com.snypir.callback.model.NamePhone;
+import com.snypir.callback.model.UnusedNumber;
 import com.snypir.callback.network.AccountNumbersList;
 import com.snypir.callback.network.AuthRestClient;
 import com.snypir.callback.network.CallbackNumbersList;
@@ -31,6 +32,8 @@ import com.snypir.callback.utils.ContactUtils;
 import com.snypir.callback.utils.ContentProviderUtils;
 import com.snypir.callback.utils.ErrorHandler;
 import com.snypir.callback.view.SlidingTabLayout;
+import com.snypir.callback.widget.DepthTransformer;
+import com.snypir.callback.widget.SnypirViewPager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -43,11 +46,11 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.web.client.RestClientException;
 
 import java.util.List;
-import java.util.Locale;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends BaseActivity implements ActionBar.TabListener {
+public class MainActivity extends BaseActivity {
 
+    public static final int INFO_PAGE = 4;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -62,7 +65,10 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
      * The {@link ViewPager} that will host the section contents.
      */
     @ViewById(R.id.viewpager)
-    ViewPager viewPager;
+    SnypirViewPager viewPager;
+
+    @ViewById(R.id.sliding_tab)
+    SlidingTabLayout tabLayout;
 
     @Pref
     Prefs_ preferences;
@@ -75,10 +81,6 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
 
     @Bean
     ErrorHandler errorHandler;
-
-    SlidingTabLayout tabLayout;
-    private MenuItem settings;
-    private MenuItem register;
 
     private Runnable initialUploadContacts = new Runnable() {
         @Override
@@ -99,24 +101,21 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
 
     @AfterViews
     void init() {
-        final ActionBar actionBar = getActionBar();
-        tabLayout = new SlidingTabLayout(this);
-        if (actionBar != null) {
-            actionBar.setDisplayShowHomeEnabled(false);
-            actionBar.setDisplayShowCustomEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setDisplayUseLogoEnabled(false);
-            actionBar.setCustomView(tabLayout);
-        }
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
+        getActionBar().hide();
+
         pagerAdapter = new SectionsPagerAdapter(getFragmentManager());
+
 
         // Set up the ViewPager with the sections adapter.
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(5);
+        viewPager.setPagingEnabled(false);
+        viewPager.setPageTransformer(true, new DepthTransformer());
 
         tabLayout.setViewPager(viewPager);
-        getWindow().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#343434")));
+
     }
 
     private void checkLogin() {
@@ -124,16 +123,15 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
     }
 
     private void initMenuItems() {
-        if (settings != null) {
-            settings.setVisible(isUserSignedIn());
+        if (!isUserSignedIn()) {
+            finish();
+            HowToActivity_.intent(this).start();
         }
-        if (register != null) {
-            register.setVisible(!isUserSignedIn());
-        }
+        tabLayout.setVisibility(isUserSignedIn() ? View.VISIBLE : View.GONE);
     }
 
-    void uploadContacts(){
-        if (!preferences.isInitialContactsUploaded().get()){
+    void uploadContacts() {
+        if (!preferences.isInitialContactsUploaded().get()) {
             AsyncTask.SERIAL_EXECUTOR.execute(initialUploadContacts);
         }
     }
@@ -144,39 +142,15 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        settings = menu.findItem(R.id.action_settings);
-        register = menu.findItem(R.id.action_register);
-        initMenuItems();
-        return true;
-    }
-
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // When the given tab is selected, switch to the corresponding page in
-        // the ViewPager.
-        viewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
-
-    public void startSearchActivity(MenuItem item) {
-        SearchActivity_.intent(this).start();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         resumeAction();
         uploadContacts();
+    }
+
+    @Override
+    public Fragment getBaseFragment() {
+        return null;
     }
 
     @UiThread
@@ -195,7 +169,7 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
             final AccountNumbersList data = rest.client.getAllAccountNumbers().getData();
             fillMyNumbers(data.getInfos());
         } catch (RestClientException e) {
-            errorHandler.showInfo(e);
+//            errorHandler.showInfo(e);
         }
     }
 
@@ -214,29 +188,40 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
             return;
         }
         try {
-            final CallbackNumbersList all = rest.client.CallbackNumbers().getData();
-            fillContacts(all.getCallbackNumbers());
+            final CallbackNumbersList all = rest.client.getAllNumbers().getData();
+            fillContacts(all);
         } catch (RestClientException e) {
-            errorHandler.showInfo(e);
+//            errorHandler.showInfo(e);
         }
     }
 
-    void fillContacts(List<CallbackNumberInfo> infos) {
-        for (CallbackNumberInfo info : infos) {
-            if (!info.isFavorite()) {
-                ContentProviderUtils.removePhone(this, info.getСallbackNumber());
-            } else {
-                final String number = info.getPhoneNumber();
-                if (!TextUtils.isEmpty(number)) {
-                    fillContact(info);
-                    info.setCallbackNumber(ContactUtils.modifyPhoneNumber(info.getСallbackNumber()));
-                    info.save();
-                }
+    void fillContacts(CallbackNumbersList infos) {
+        BlueNumber.deleteAll();
+        GoldNumber.deleteAll();
+        saveNumbers(infos.getBlueNumbers());
+        saveNumbers(infos.getGoldNumbers());
+        removeUnusedNumbers(infos.getUnusedNumbers());
+    }
+
+    private <T extends NamePhone> void saveNumbers(List<T> numbers) {
+        for (NamePhone info : numbers) {
+            final String number = info.getPhoneNumber();
+            if (!TextUtils.isEmpty(number)) {
+                fillContact(info);
+                info.setCallbackNumber(ContactUtils.modifyPhoneNumber(info.getCallbackNumber()));
+                info.prepare(this);
+                info.save();
             }
         }
     }
 
-    void fillContact(CallbackNumberInfo info) {
+    void removeUnusedNumbers(List<UnusedNumber> numbers) {
+        for (UnusedNumber number : numbers) {
+            ContentProviderUtils.removePhone(this, number.getCallbackNumber());
+        }
+    }
+
+    void fillContact(NamePhone info) {
         Cursor c = ContentProviderUtils.findPhoneNumber(this, info.getPhoneNumber());
         if (c == null) {
             return;
@@ -244,7 +229,7 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
         try {
             if (c.moveToFirst()) {
                 long rawContactId = ContactUtils.getRawContactId(c);
-                ContentProviderUtils.addPhone(this, rawContactId, info.getСallbackNumber());
+                ContentProviderUtils.addPhone(this, rawContactId, info.getCallbackNumber());
             }
         } finally {
             c.close();
@@ -256,7 +241,7 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
     }
 
     public void register(MenuItem item) {
-        LoginActivity_.intent(this).start();
+        LoginActivity_.intent(this).primary(true).start();
     }
 
     /**
@@ -267,9 +252,10 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
 
         String[] mFragments = new String[]{
                 ContactsAllFragment_.class.getName(),
-                ContactsSnypirFragment_.class.getName(),
+                BlueContactsFragment_.class.getName(),
+                GoldContactsFragment_.class.getName(),
                 DummyFragment_.class.getName(),
-                DummyFragment_.class.getName()
+                SettingsFragment_.class.getName()
         };
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -291,13 +277,6 @@ public class MainActivity extends BaseActivity implements ActionBar.TabListener 
         @Nullable
         @Override
         public CharSequence getPageTitle(int position) {
-            Locale l = Locale.getDefault();
-            switch (position) {
-                case 0:
-                    return getString(R.string.all).toUpperCase(l);
-                case 1:
-                    return getString(R.string.snypir).toUpperCase(l);
-            }
             return null;
         }
     }

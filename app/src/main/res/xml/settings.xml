@@ -1,28 +1,35 @@
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
         android:key="category_numbers"
         android:title="@string/my_numbers">
         <Preference
             android:key="add_number"
-            android:title="@string/add_number"
-            />
+            android:title="@string/add_number" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/account">
 
         <com.snypir.callback.widget.IntTextViewPreference
             android:key="balance"
-            android:title="@string/bubbles"
             android:summary="@string/click_to_add_bubbles"
-            android:widgetLayout="@layout/text"
+            android:title="@string/credits"
+            android:widgetLayout="@layout/text" />
+
+        <CheckBoxPreference
+            android:key="turbo"
+            android:summary="@string/turbo_description"
+            android:title="@string/turbo_mode" />
+
+        <Preference
+            android:key="subscribe"
+            android:title="12 августа 22:44"
+            android:summary="@string/subscription_ends"
             />
 
         <Preference
             android:key="logout"
-            android:title="@string/logout"
-            />
+            android:title="@string/logout" />
     </PreferenceCategory>
 
 </PreferenceScreen>

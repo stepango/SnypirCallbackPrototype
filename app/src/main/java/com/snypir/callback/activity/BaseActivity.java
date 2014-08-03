@@ -3,6 +3,7 @@ package com.snypir.callback.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -10,17 +11,21 @@ import android.view.MenuItem;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.snypir.callback.App_;
+import com.snypir.callback.R;
 import com.snypir.callback.service.ContactDataUploaderService_;
 
 /**
  * Created by stepangoncarov on 09/06/14.
  */
-public class BaseActivity extends Activity {
+public abstract class BaseActivity extends Activity {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         actionBarInit();
+        if (savedInstanceState == null && getBaseFragment() != null){
+            getFragmentManager().beginTransaction().add(R.id.lay_root, getBaseFragment()).commit();
+        }
     }
 
     protected void actionBarInit(){
@@ -57,4 +62,6 @@ public class BaseActivity extends Activity {
         }
         return false;
     }
+
+    public abstract Fragment getBaseFragment();
 }

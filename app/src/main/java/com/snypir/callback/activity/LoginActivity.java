@@ -104,6 +104,11 @@ public class LoginActivity extends BaseActivity {
     }
 
     @Override
+    public Fragment getBaseFragment() {
+        return null;
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this)

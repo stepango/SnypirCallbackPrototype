@@ -9,18 +9,4 @@
         android:showAsAction="withText|always"
         />
 
-    <item
-        android:id="@+id/action_search"
-        android:title="@string/search"
-        android:icon="@android:drawable/ic_menu_search"
-        android:onClick="startSearchActivity"
-        android:showAsAction="always"/>
-    <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:onClick="startSettingsActivity"
-        android:showAsAction="always"
-        />
-
 </menu>

@@ -23,6 +23,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -62,6 +63,7 @@ class SlidingTabStrip extends LinearLayout {
     SlidingTabStrip(Context context, AttributeSet attrs) {
         super(context, attrs);
         setWillNotDraw(false);
+        setGravity(Gravity.CENTER);
 
         final float density = getResources().getDisplayMetrics().density;
 

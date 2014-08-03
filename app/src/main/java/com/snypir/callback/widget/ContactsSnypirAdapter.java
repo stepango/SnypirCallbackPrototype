@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -20,6 +19,7 @@ import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public class ContactsSnypirAdapter extends CursorAdapter {
 
     private final Context mContext;
@@ -30,34 +30,6 @@ public class ContactsSnypirAdapter extends CursorAdapter {
         super(context, null, true);
         mContext = context;
         mInflater = LayoutInflater.from(context);
-    }
-
-    @Override
-    public int getCount() {
-        if (getCursor() == null) {
-            return 0;
-        }
-        return getCursor().getCount();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        final Cursor c = getCursor();
-        if (c == null) {
-            return null;
-        }
-        c.moveToPosition(position);
-        return c;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        final Cursor c = getCursor();
-        if (c == null) {
-            return 0;
-        }
-        c.moveToPosition(position);
-        return c.getLong(c.getColumnIndex(BaseColumns._ID));
     }
 
     @Nullable

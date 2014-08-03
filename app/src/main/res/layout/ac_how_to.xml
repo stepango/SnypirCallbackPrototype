@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:text="@string/how_to_title"
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextLargeCaps.Thin"
+            android:textColor="@color/orange" />
+
+        <android.support.v7.widget.CardView
+            style="@style/HowToCard"
+            app:cardBackgroundColor="@color/orange"
+            app:cardCornerRadius="4dp"
+            android:id="@+id/cv_sim_reg"
+            >
+
+            <LinearLayout style="@style/HowToCard_Child">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/register_sim"
+                    android:textAppearance="@style/TextLargeCaps" />
+
+                <TextView
+                    android:id="@+id/txt_special_offer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextSmallCaps" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            style="@style/HowToCard"
+            app:cardBackgroundColor="@color/orange"
+            app:cardCornerRadius="4dp"
+            android:id="@+id/cv_purchase">
+
+            <LinearLayout style="@style/HowToCard_Child">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/buy_subscription"
+                    android:textAppearance="@style/TextLargeCaps" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/call_free_to_registered_users"
+                    android:textAppearance="@style/TextSmallCaps" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            style="@style/HowToCard"
+            app:cardBackgroundColor="@color/orange"
+            app:cardCornerRadius="4dp"
+            android:foreground="@null">
+
+            <LinearLayout style="@style/HowToCard_Child">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_credits"
+                    android:textAppearance="@style/TextLargeCaps" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/call_free_to_other_users"
+                    android:textAppearance="@style/TextSmallCaps" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/lay_prices"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/TextMediumCaps"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/you_have" />
+
+                        <TextView
+                            style="@style/TextLargeCaps"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:layout_marginLeft="16dp"
+                            android:layout_marginRight="16dp"
+                            android:layout_marginTop="4dp"
+                            android:text="80" />
+
+                        <TextView
+                            style="@style/TextMediumCaps"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/cr" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cv_operator"
+            style="@style/HowToCard"
+            app:cardBackgroundColor="@color/orange"
+            app:cardCornerRadius="4dp">
+
+            <LinearLayout style="@style/HowToCard_Child">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tune_your_operator"
+                    android:textAppearance="@style/TextLargeCaps" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/activate_freee_incoming_calls"
+                    android:textAppearance="@style/TextSmallCaps" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+</ScrollView>

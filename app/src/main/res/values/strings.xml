@@ -22,7 +22,7 @@
     <string name="number_deleted">Number deleted</string>
     <string name="enter_confirmation_code">Enter phones last 4 digits</string>
     <string name="all_numbers_already_favorite">No numbers to add to Favorites</string>
-    <string name="bubbles">Bubbles</string>
+    <string name="credits">Credits</string>
     <string name="click_to_add_bubbles">Click to get bubbles</string>
     <string name="callback">Callback</string>
     <string name="change_callback_status">Change callback status</string>
@@ -41,5 +41,26 @@
     <string name="secondary_number">Secondary number</string>
     <string name="delete">Delete</string>
     <string name="choose_items_to_delete">Choose items to delete</string>
+    <string name="register_sim">Register SIM</string>
+    <string name="how_to_title">How to become roaming ninja</string>
+    <string name="call_free_to_registered_users">Call other ninjas without limits</string>
+    <string name="buy_subscription">Subscribe</string>
+    <string name="add_credits">Add credits</string>
+    <string name="call_free_to_other_users">Call all your contacts</string>
+    <string name="tune_your_operator">Setup your operator</string>
+    <string name="activate_freee_incoming_calls">Activate free incoming calls</string>
+    <string name="you_have">Your credits:</string>
+    <string name="cr">cr.</string>
+    <string name="add_sim">ADD SIM</string>
+    <string name="operators_screen_description">We help you to choose cheapest incoming calls from your operator</string>
+    <string name="choose_operator">Choose your operator:</string>
+    <string name="MTS">MTS</string>
+    <string name="megafon">Megafon</string>
+    <string name="beeline">Beeline</string>
+    <string name="other">Other</string>
+    <string name="reg_sim_first">Register your sim first</string>
+    <string name="turbo_mode">Turbo mode</string>
+    <string name="turbo_description">Стоимость исходящих и входящих звонков списывается напрямую с твоего счета после окончания кредитов включается подписка</string>
+    <string name="subscription_ends">Окончание подписки</string>
 
 </resources>

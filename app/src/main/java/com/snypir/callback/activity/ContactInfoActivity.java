@@ -1,9 +1,10 @@
 package com.snypir.callback.activity;
 
+import android.app.Fragment;
+
 import com.snypir.callback.R;
 import com.snypir.callback.fragment.ContactInfoFragment_;
 
-import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 
@@ -16,14 +17,10 @@ public class ContactInfoActivity extends BaseActivity {
     @Extra("contactId")
     long contactId;
 
-    @AfterInject
-    void init(){
-        getFragmentManager()
-                .beginTransaction()
-                .add(R.id.lay_root, ContactInfoFragment_.builder()
-                        .mContactId(contactId)
-                        .build()
-                ).commit();
+    @Override
+    public Fragment getBaseFragment() {
+        return ContactInfoFragment_.builder()
+                .mContactId(contactId)
+                .build();
     }
-
 }

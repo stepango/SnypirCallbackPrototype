@@ -7,10 +7,10 @@ import com.snypir.callback.R;
 import org.androidannotations.annotations.EActivity;
 
 /**
- * Created by stepangoncarov on 27/05/14.
+ * Created by stepangoncarov on 23/07/14.
  */
-@EActivity(R.layout.ac_search)
-public class SearchActivity extends BaseActivity {
+@EActivity(R.layout.ac_operator)
+public class OperatorActivity extends BaseActivity {
     @Override
     public Fragment getBaseFragment() {
         return null;

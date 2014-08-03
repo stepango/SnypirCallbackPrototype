@@ -1,5 +1,7 @@
 package com.snypir.callback.activity;
 
+import android.app.Fragment;
+
 import com.snypir.callback.R;
 import com.snypir.callback.fragment.SettingsFragment_;
 
@@ -19,13 +21,9 @@ public class SettingsActivity extends BaseActivity{
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
 
-        getFragmentManager()
-                .beginTransaction()
-                .replace(R.id.lay_root, SettingsFragment_.builder().build())
-                .commit();
+    @Override
+    public Fragment getBaseFragment() {
+        return SettingsFragment_.builder().build();
     }
 }

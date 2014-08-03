@@ -16,7 +16,12 @@
 
 package com.snypir.callback.view;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -24,6 +29,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -53,8 +59,19 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     private static final int TAB_VIEW_PADDING_VERTICAL_DIPS = 10;
     private static final int[] IMAGES = new int[]{
-            R.drawable.ic_man, R.drawable.ic_star,
-            R.drawable.ic_empty_star, R.drawable.ic_sotry
+            R.drawable.ic_man,
+            R.drawable.ic_star,
+            R.drawable.ic_empty_star,
+            R.drawable.ic_sotry,
+            R.drawable.ic_ninja
+    };
+
+    private static final int[] COLORS = new int[]{
+            R.color.dark,
+            R.color.blue,
+            R.color.yellow,
+            R.color.purple,
+            R.color.orange
     };
     private static final int TITLE_OFFSET_DIPS = 64;
     private final SlidingTabStrip mTabStrip;
@@ -87,8 +104,9 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         mTabStrip = new SlidingTabStrip(context);
         FrameLayout.LayoutParams layoutParams =
-                new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         layoutParams.gravity = Gravity.CENTER;
+        mTabStrip.setBackgroundDrawable(new ColorDrawable(getResources().getColor(COLORS[0])));
         addView(mTabStrip, layoutParams);
     }
 
@@ -292,6 +310,23 @@ public class SlidingTabLayout extends HorizontalScrollView {
             if (mViewPagerPageChangeListener != null) {
                 mViewPagerPageChangeListener.onPageSelected(position);
             }
+
+            int color = Color.TRANSPARENT;
+            Drawable background = mTabStrip.getBackground();
+            if (background instanceof ColorDrawable) {
+                color = ((ColorDrawable) background).getColor();
+            }
+
+            final ObjectAnimator backgroundColorAnimator = ObjectAnimator.ofObject(mTabStrip,
+                    "backgroundColor",
+                    new ArgbEvaluator(),
+                    color,
+                    getResources().getColor(COLORS[position]));
+            backgroundColorAnimator.setDuration(300);
+            backgroundColorAnimator.start();
+            InputMethodManager inputMethodManager = (InputMethodManager) getContext()
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
 
     }

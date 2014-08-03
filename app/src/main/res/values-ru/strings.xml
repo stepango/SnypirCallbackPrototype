@@ -5,4 +5,24 @@
     <string name="send_invitation_description">Когда %s присоеденится к Snypir, Вы сможете общаться бесплатно.</string>
     <string name="invitation_text">Привет! Пишу тебе из Snyper. Найди его где нибудь и обязательно установи!:)</string>
     <string name="choose_number">Выберите номер</string>
+    <string name="add_number">Добавить номер</string>
+    <string name="credits">На счету кредитов</string>
+    <string name="register_sim">Зарегестрируй сим</string>
+    <string name="how_to_title">Как стать роуминг ниндзя</string>
+    <string name="call_free_to_registered_users">Чтобы звонить другим ниндзя без ограничений</string>
+    <string name="buy_subscription">Купи подписку</string>
+    <string name="add_credits">Добавь кредитов</string>
+    <string name="call_free_to_other_users">Чтобы звонить всем остальным</string>
+    <string name="tune_your_operator">Настрой оператора</string>
+    <string name="activate_freee_incoming_calls">Активируй на своей сим бесплатные входящие</string>
+    <string name="you_have">На вашем счету сейчас:</string>
+    <string name="cr">кред.</string>
+    <string name="add_sim">ДОБАВЛЕНИЕ СИМ</string>
+    <string name="operators_screen_description">Мы поможем вам активировать тарифную опцию на вашем операторе для получения дешевых входящих в роуминге</string>
+    <string name="choose_operator">Выберите своего оператора:</string>
+    <string name="MTS">МТС</string>
+    <string name="megafon">Мегафон</string>
+    <string name="beeline">Билайн</string>
+    <string name="other">Другой</string>
+    <string name="reg_sim_first">Сначала вы должны зарегистрировать сим карту</string>
 </resources>

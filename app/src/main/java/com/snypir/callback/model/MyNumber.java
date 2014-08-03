@@ -19,12 +19,16 @@ public class MyNumber extends Model {
 
     public static final String NUMBER = "number";
     public static final String FLAG = "flag";
+    public static final String COUNTRY = "country";
 
     @Column(name = NUMBER, unique = true, onUniqueConflict = Column.ConflictAction.IGNORE)
     String number;
 
     @Column(name = FLAG)
     String flag;
+
+    @Column(name = COUNTRY)
+    String country;
 
     public MyNumber() {
     }

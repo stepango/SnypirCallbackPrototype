@@ -56,9 +56,19 @@
             android:label="@string/purchase"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".activity.AddSimActivity_"
+            android:label="@string/add_sim"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.HowToActivity_"
+            android:label="@string/add_sim"
+            android:screenOrientation="portrait" />
+
         <provider
             android:name="com.activeandroid.content.ContentProvider"
-            android:authorities="com.example"
+            android:authorities="com.snypir.callback"
             android:exported="false"/>
 
         <service android:name=".service.ContactDataUploaderService_"/>
