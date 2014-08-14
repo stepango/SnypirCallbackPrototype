@@ -11,6 +11,10 @@ import com.snypir.callback.observers.ContactsObserver;
 import com.snypir.callback.preferences.Prefs_;
 import com.snypir.callback.utils.ContactUtils;
 
+import org.acra.ACRA;
+import org.acra.ReportField;
+import org.acra.ReportingInteractionMode;
+import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
@@ -21,6 +25,18 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
  * Created by stepangoncarov on 12/06/14.
  */
 @EApplication
+@ReportsCrashes(formKey = "", // will not be used
+        mailTo = "step.89.g@gmail.com",
+        mode = ReportingInteractionMode.TOAST,
+        resToastText = R.string.crash_msg,
+        customReportContent = {
+                ReportField.APP_VERSION_CODE,
+                ReportField.APP_VERSION_NAME,
+                ReportField.ANDROID_VERSION,
+                ReportField.PHONE_MODEL,
+                ReportField.CUSTOM_DATA,
+                ReportField.STACK_TRACE,
+                ReportField.LOGCAT})
 public class App extends Application {
 
     @Bean(ContactsObserver.class)
@@ -46,7 +62,7 @@ public class App extends Application {
     }
 
     @AfterInject
-    void init(){
+    void init() {
         if (!preferences.isContactsDumped().get()) {
             AsyncTask.SERIAL_EXECUTOR.execute(dumpContactStates);
         }
@@ -55,6 +71,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        ACRA.init(this);
         registerContactsChangeObserver();
     }
 
@@ -71,7 +88,7 @@ public class App extends Application {
                         false, observer);
     }
 
-    void unregisterContactChangeReceiver(){
+    void unregisterContactChangeReceiver() {
         getContentResolver().unregisterContentObserver(observer);
     }
 }

@@ -30,6 +30,7 @@ public class HowToActivity extends BaseActivity{
         super.onResume();
         if (isUserSignedIn()){
             finish();
+            MainActivity_.intent(this).start();
         }
     }
 
