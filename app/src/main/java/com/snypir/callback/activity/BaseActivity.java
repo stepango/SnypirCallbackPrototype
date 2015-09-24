@@ -2,17 +2,11 @@ package com.snypir.callback.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import com.snypir.callback.App_;
 import com.snypir.callback.R;
-import com.snypir.callback.service.ContactDataUploaderService_;
 
 /**
  * Created by stepangoncarov on 09/06/14.
@@ -41,26 +35,6 @@ public abstract class BaseActivity extends Activity {
             onBackPressed();
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Tracker t = ((App_) getApplication()).getTracker();
-        t.setScreenName(getClass().getSimpleName());
-
-        // Send a screen view.
-        t.send(new HitBuilders.AppViewBuilder().build());
-    }
-
-    public boolean isUploadServiceRunning(){
-        ActivityManager manager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (ContactDataUploaderService_.class.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public abstract Fragment getBaseFragment();

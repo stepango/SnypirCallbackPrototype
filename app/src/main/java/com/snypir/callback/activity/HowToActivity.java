@@ -22,7 +22,9 @@ public class HowToActivity extends BaseActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActionBar().hide();
+        if (getActionBar() != null) {
+            getActionBar().hide();
+        }
     }
 
     @Override

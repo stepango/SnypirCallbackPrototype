@@ -32,7 +32,7 @@ public class CallConfirmDialogFragment extends DialogFragment {
     }
 
     @Click(R.id.btn_confirm)
-    void confirm(View v) {
+    void confirm() {
         final String confirmationCode = mEditText.getText().toString();
         if (confirmationCode.length() < 4) {
             mEditText.setError(getString(R.string.wrong_confirmation_code_try_one_more_time));

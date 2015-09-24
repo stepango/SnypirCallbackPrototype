@@ -5,8 +5,6 @@ import android.os.AsyncTask;
 import android.provider.ContactsContract;
 
 import com.activeandroid.app.Application;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Tracker;
 import com.snypir.callback.observers.ContactsObserver;
 import com.snypir.callback.preferences.Prefs_;
 import com.snypir.callback.utils.ContactUtils;
@@ -25,8 +23,8 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
  * Created by stepangoncarov on 12/06/14.
  */
 @EApplication
-@ReportsCrashes(formKey = "", // will not be used
-        mailTo = "step.89.g@gmail.com",
+@ReportsCrashes(
+        mailTo = "your@mail.here",
         mode = ReportingInteractionMode.TOAST,
         resToastText = R.string.crash_msg,
         customReportContent = {
@@ -45,21 +43,12 @@ public class App extends Application {
     @Pref
     Prefs_ preferences;
 
-    private Tracker tracker;
-
     private Runnable dumpContactStates = new Runnable() {
         @Override
         public void run() {
             preferences.isContactsDumped().put(ContactUtils.dumpContactStates(App.this));
         }
     };
-
-    public synchronized Tracker getTracker() {
-        if (tracker != null) return tracker;
-        GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-        tracker = analytics.newTracker(R.xml.app_tracker);
-        return tracker;
-    }
 
     @AfterInject
     void init() {

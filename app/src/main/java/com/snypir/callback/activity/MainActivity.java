@@ -103,7 +103,9 @@ public class MainActivity extends BaseActivity {
     void init() {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        getActionBar().hide();
+        if (getActionBar() != null) {
+            getActionBar().hide();
+        }
 
         pagerAdapter = new SectionsPagerAdapter(getFragmentManager());
 
@@ -155,7 +157,7 @@ public class MainActivity extends BaseActivity {
 
     @UiThread
     public void resumeAction() {
-        checkLogin();
+//        checkLogin();
         populateFriendsPhones();
         populateMyPhones();
     }

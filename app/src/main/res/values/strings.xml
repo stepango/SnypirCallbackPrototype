@@ -60,8 +60,8 @@
     <string name="other">Other</string>
     <string name="reg_sim_first">Register your sim first</string>
     <string name="turbo_mode">Turbo mode</string>
-    <string name="turbo_description">Стоимость исходящих и входящих звонков списывается напрямую с твоего счета после окончания кредитов включается подписка</string>
-    <string name="subscription_ends">Окончание подписки</string>
-    <string name="crash_msg">Произошла ошибка, отправьте нам отчет и мы обязательно ее исправим</string>
+    <string name="turbo_description">After subscription ends bad things will happen with your money</string>
+    <string name="subscription_ends">Subscription ends</string>
+    <string name="crash_msg">Your crash report message</string>
 
 </resources>
